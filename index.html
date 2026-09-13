@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>TRACEDU — Lost &amp; found for university students across every campus.</title>
+<meta name="description" content="TRACEDU is a shared lost-and-found for university students across every campus. Report it, search it, let TRACEDU bring it back." />
+<meta name="theme-color" content="#0A0F0D" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink:{DEFAULT:'#0A0F0D',soft:'#0E1412',card:'#111815',deep:'#070B09'},
+          emer:{DEFAULT:'#10A97A',deep:'#0A7A57',glow:'#28D9A0'},
+          lime:{DEFAULT:'#B8FF5C',dim:'#8FD93F'},
+          cream:'#F5F3EE', mist:'#8BA399'
+        },
+        fontFamily:{
+          display:['"Space Grotesk"','Inter','system-ui','sans-serif'],
+          sans:['Inter','system-ui','-apple-system','sans-serif']
+        }
+      }
+    }
+  };
+</script>
+<style>
+  :root{color-scheme:dark;}
+  html,body{height:100%;}
+  body{
+    font-family:'Inter',system-ui,sans-serif;background-color:#0A0F0D;color:#F5F3EE;
+    background-image:
+      radial-gradient(1200px 600px at 15% -10%, rgba(16,169,122,.08), transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, rgba(184,255,92,.05), transparent 60%);
+    background-attachment:fixed;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  *{-webkit-tap-highlight-color:transparent;}
+  ::selection{background:rgba(16,169,122,.35);color:#fff;}
+  :focus-visible{outline:2px solid #28D9A0;outline-offset:2px;border-radius:8px;}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:9999px;}
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
+  }
+  .screen{display:none;}
+  .screen.is-active{display:block;animation:screenIn .45s cubic-bezier(.16,1,.3,1) both;}
+  @keyframes screenIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .glass{background:linear-gradient(180deg,rgba(22,32,28,.85),rgba(14,20,18,.85));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.07);}
+  .card{background:#111815;border:1px solid rgba(255,255,255,.06);border-radius:24px;transition:all .3s cubic-bezier(.16,1,.3,1);}
+  .card-hover:hover{border-color:rgba(16,169,122,.4);transform:translateY(-2px);box-shadow:0 10px 40px -20px rgba(0,0,0,.6);}
+  .grain{position:relative;}
+  .grain::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.35;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.35 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode:overlay;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:9999px;font-weight:500;transition:all .2s cubic-bezier(.16,1,.3,1);padding:.65rem 1.25rem;font-size:.875rem;cursor:pointer;border:none;user-select:none;}
+  .btn-primary{background:#10A97A;color:#0A0F0D;box-shadow:0 0 40px -10px rgba(16,169,122,.45);}
+  .btn-primary:hover{background:#28D9A0;transform:translateY(-1px);}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.1);color:#F5F3EE;}
+  .btn-ghost:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.2);}
+  .btn-lime{background:#B8FF5C;color:#0A0F0D;}
+  .btn-lime:hover{background:#8FD93F;transform:translateY(-1px);}
+  .chip{display:inline-flex;align-items:center;gap:.375rem;font-size:.6875rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:9999px;padding:.25rem .75rem;border:1px solid;}
+  .label{display:block;font-size:.6875rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:#8BA399;margin-bottom:.5rem;}
+  .field{width:100%;background:#0E1412;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:.75rem 1rem;color:#F5F3EE;outline:none;transition:border-color .15s ease;font-family:inherit;font-size:.95rem;}
+  .field::placeholder{color:rgba(139,163,153,.6);}
+  .field:focus{border-color:rgba(16,169,122,.6);}
+  .skeleton{background:linear-gradient(90deg,#131a17 0%,#1c2823 50%,#131a17 100%);background-size:200% 100%;animation:shimmer 1.6s linear infinite;border-radius:16px;}
+  @keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+  @keyframes pulseNode{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.6);opacity:.35;}}
+  .pulse-node{animation:pulseNode 2.6s ease-in-out infinite;transform-origin:center;transform-box:fill-box;}
+  @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  .animate-rise{animation:rise .5s cubic-bezier(.16,1,.3,1) both;}
+  .modal-backdrop{position:fixed;inset:0;z-index:100;display:none;align-items:flex-end;justify-content:center;padding:0;}
+  @media (min-width:640px){.modal-backdrop{align-items:center;padding:1rem;}}
+  .modal-backdrop.is-open{display:flex;}
+  .modal-backdrop::before{content:'';position:absolute;inset:0;background:rgba(7,11,9,.8);backdrop-filter:blur(4px);}
+  .modal-panel{position:relative;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;background:linear-gradient(180deg,#16201C,#0E1412);border:1px solid rgba(255,255,255,.07);border-radius:24px 24px 0 0;box-shadow:0 30px 80px -20px rgba(0,0,0,.7);animation:sheetIn .3s cubic-bezier(.16,1,.3,1) both;}
+  @media (min-width:640px){.modal-panel{border-radius:24px;}}
+  @keyframes sheetIn{from{transform:translateY(30px);opacity:.6;}to{transform:translateY(0);opacity:1;}}
+  #toast-region{position:fixed;bottom:calc(5.5rem + env(safe-area-inset-bottom,0px));left:0;right:0;z-index:130;display:flex;flex-direction:column;gap:.6rem;align-items:center;padding:0 1rem;pointer-events:none;}
+  @media (min-width:1024px){#toast-region{bottom:1.5rem;}}
+  .toast{pointer-events:auto;background:#10A97A;color:#0A0F0D;padding:.9rem 1.1rem;border-radius:16px;display:flex;align-items:center;gap:.75rem;box-shadow:0 18px 48px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.08);width:100%;max-width:420px;font-weight:500;animation:toastIn .35s cubic-bezier(.16,1,.3,1) both;}
+  @keyframes toastIn{from{opacity:0;transform:translateY(14px) scale(.96);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  img,svg{max-width:100%;}
+  .trail-dot{width:32px;height:32px;border-radius:9999px;background:#0E1412;border:1.5px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.75rem;color:#8BA399;transition:all .2s cubic-bezier(.16,1,.3,1);}
+  .trail-dot.is-current{border-color:#10A97A;background:rgba(16,169,122,.15);color:#28D9A0;transform:scale(1.08);}
+  .trail-dot.is-done{border-color:rgba(16,169,122,.4);background:rgba(16,169,122,.1);color:#28D9A0;}
+  #demo-bar{position:fixed;bottom:calc(5.5rem + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:120;width:calc(100% - 2rem);max-width:520px;transition:all .3s;}
+  @media (min-width:1024px){#demo-bar{bottom:1.5rem;}}
+  #demo-bar.hidden{display:none;}
+  @keyframes demoPulse{0%,100%{box-shadow:0 0 0 0 rgba(184,255,92,.4);}50%{box-shadow:0 0 0 12px rgba(184,255,92,0);}}
+  .demo-pulse{animation:demoPulse 2s ease-in-out infinite;}
+
+  /* Demo reliability + polish */
+  .demo-stage{position:relative;}
+  .demo-stage::after{content:"DEMO MODE · SAMPLE DATA";position:absolute;top:14px;right:14px;font-size:9px;letter-spacing:.16em;color:#B8FF5C;border:1px solid rgba(184,255,92,.28);background:rgba(10,15,13,.72);padding:6px 9px;border-radius:999px;backdrop-filter:blur(8px);pointer-events:none;}
+  .demo-note{border:1px solid rgba(184,255,92,.22);background:rgba(184,255,92,.045);border-radius:16px;padding:.8rem 1rem;}
+  button:disabled{transform:none!important;}
+  @media (max-width:639px){#demo-bar{width:calc(100% - 1rem);}#demo-bar .glass{padding:.65rem;}#demo-bar .btn-lime{padding:.5rem .75rem;} .demo-stage::after{font-size:8px;top:10px;right:10px;}}
+
+  /* Multi-campus badge strip */
+  .campus-pill{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .7rem;border-radius:9999px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.02);font-size:.7rem;font-weight:500;letter-spacing:.03em;color:#8BA399;transition:all .2s cubic-bezier(.16,1,.3,1);}
+  .campus-pill:hover{border-color:rgba(16,169,122,.4);color:#F5F3EE;}
+  .campus-dot{width:6px;height:6px;border-radius:9999px;background:#10A97A;flex:none;}
+</style>
+</head>
+<body>
+
+<a href="#main" class="visually-hidden">Skip to main content</a>
+
+<!-- ============ NAVBAR ============ -->
+<header id="navbar" class="sticky top-0 z-50 transition-all">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8">
+    <div class="flex items-center justify-between h-16 gap-3">
+      <button id="nav-home" class="flex items-center gap-2.5 shrink-0" aria-label="Go home">
+        <span class="font-display text-xl font-bold tracking-tight">TRACE<span class="text-emer">DU</span></span>
+        <span class="text-[10px] tracking-widest text-mist border-l border-white/10 pl-2.5 hidden sm:inline uppercase">Multi-campus · University students</span>
+      </button>
+      <nav id="desktop-nav" class="hidden lg:flex items-center gap-1 bg-white/[0.03] border border-white/[0.06] rounded-full p-1"></nav>
+      <div class="flex items-center gap-1.5">
+        <button id="demo-open-btn" class="hidden sm:inline-flex btn btn-ghost text-xs" style="padding:.5rem .9rem;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+          Try demo
+        </button>
+        <button id="notifications-btn" class="relative p-2.5 rounded-full hover:bg-white/5 transition" aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="notif-dot" class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-lime"></span>
+        </button>
+        <button id="profile-btn" class="hidden sm:flex items-center justify-center w-9 h-9 rounded-full" style="background:linear-gradient(135deg,#10A97A,#0A7A57);color:#0A0F0D;" aria-label="Profile">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 21a8 8 0 0116 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button id="mobile-menu-btn" class="lg:hidden p-2.5 rounded-full hover:bg-white/5" aria-label="Menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <nav id="mobile-nav" class="hidden lg:hidden border-t border-white/[0.06] glass">
+    <div class="px-5 py-4 flex flex-col gap-1"></div>
+  </nav>
+</header>
+
+<main id="main">
+  <section id="screen-home" class="screen is-active"><div id="home-mount"></div></section>
+  <section id="screen-browse" class="screen"><div class="max-w-7xl mx-auto px-5 lg:px-8 py-10 lg:py-16" id="browse-mount"></div></section>
+  <section id="screen-report-lost" class="screen"><div class="max-w-3xl mx-auto px-5 lg:px-8 py-10 lg:py-16" id="report-lost-mount"></div></section>
+  <section id="screen-report-found" class="screen"><div class="max-w-3xl mx-auto px-5 lg:px-8 py-10 lg:py-16" id="report-found-mount"></div></section>
+  <section id="screen-item" class="screen"><div class="max-w-6xl mx-auto px-5 lg:px-8 py-10 lg:py-16" id="item-mount"></div></section>
+  <section id="screen-cases" class="screen"><div class="max-w-5xl mx-auto px-5 lg:px-8 py-10 lg:py-16" id="cases-mount"></div></section>
+  <section id="screen-notifications" class="screen"><div class="max-w-3xl mx-auto px-5 lg:px-8 py-10 lg:py-16" id="notifications-mount"></div></section>
+  <section id="screen-map" class="screen"><div class="max-w-7xl mx-auto px-5 lg:px-8 py-10 lg:py-16" id="map-mount"></div></section>
+  <section id="screen-good-samaritan" class="screen"><div class="max-w-5xl mx-auto px-5 lg:px-8 py-10 lg:py-16" id="samaritan-mount"></div></section>
+  <section id="screen-admin" class="screen"><div class="max-w-7xl mx-auto px-5 lg:px-8 py-10 lg:py-16" id="admin-mount"></div></section>
+</main>
+
+<footer class="mt-20 border-t border-white/[0.06]">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8 py-14 grid gap-10 md:grid-cols-4">
+    <div class="md:col-span-2">
+      <p class="font-display text-2xl font-bold">TRACE<span class="text-emer">DU</span></p>
+      <p class="text-[11px] tracking-widest text-mist mt-1 uppercase">Multi-campus · University students</p>
+      <p class="mt-4 text-mist text-sm max-w-sm">A shared lost-and-found for university students across every campus — helping belongings find their way home.</p>
+    </div>
+    <div>
+      <p class="label">Explore</p>
+      <ul class="space-y-2 text-sm text-cream/80">
+        <li><button class="hover:text-emer-glow transition" data-go="browse">Browse</button></li>
+        <li><button class="hover:text-emer-glow transition" data-go="report-lost">Report Lost</button></li>
+        <li><button class="hover:text-emer-glow transition" data-go="report-found">Report Found</button></li>
+        <li><button class="hover:text-emer-glow transition" data-go="cases">My Cases</button></li>
+        <li><button class="hover:text-emer-glow transition" data-go="map">Campus Map</button></li>
+        <li><button class="hover:text-emer-glow transition" data-go="admin">Student Support</button></li>
+      </ul>
+    </div>
+    <div>
+      <p class="label">More</p>
+      <ul class="space-y-2 text-sm text-cream/80">
+        <li><button class="hover:text-emer-glow transition" data-go="good-samaritan">Good Samaritan</button></li>
+        <li><button class="hover:text-emer-glow transition" data-go="notifications">Notifications</button></li>
+        <li><a href="#" class="hover:text-emer-glow transition">Privacy</a></li>
+        <li><a href="#" class="hover:text-emer-glow transition">Terms</a></li>
+        <li><a href="#" class="hover:text-emer-glow transition">Help</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-white/[0.06] py-5 text-center text-xs text-mist">
+    Prototype demo · Sample data · Not connected to any real university records
+  </div>
+</footer>
+
+<nav id="bottom-nav" class="lg:hidden fixed bottom-0 left-0 right-0 z-40 glass border-t border-white/[0.06]" style="padding-bottom:env(safe-area-inset-bottom);">
+  <div class="grid grid-cols-5"></div>
+</nav>
+
+<!-- Demo tour bar -->
+<div id="demo-bar" class="hidden">
+  <div class="glass rounded-2xl p-3 demo-pulse" style="border:1px solid rgba(184,255,92,.35);">
+    <div class="flex items-center gap-3">
+      <div class="flex-none w-9 h-9 rounded-xl flex items-center justify-center font-display font-bold text-sm" style="background:rgba(184,255,92,.15);color:#B8FF5C;" id="demo-step-num">1/5</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-[10px] uppercase tracking-widest" style="color:#B8FF5C;">Guided demo · sample data</p>
+        <p class="text-sm font-medium truncate" id="demo-title">Browse the campus feed</p>
+      </div>
+      <button id="demo-next" class="btn btn-lime text-xs" style="padding:.5rem .9rem;">Next →</button>
+      <button id="demo-skip" class="p-2 rounded-full hover:bg-white/5 text-mist" aria-label="Exit demo">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="mt-2 h-1 rounded-full overflow-hidden" style="background:rgba(255,255,255,.07);">
+      <div id="demo-progress" class="h-full rounded-full transition-all duration-300" style="width:20%;background:#B8FF5C;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-root" class="modal-backdrop" data-modal>
+  <div class="modal-panel" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-between px-6 pt-5 pb-3 sticky top-0 z-10" style="background:linear-gradient(180deg,#16201C,#16201C);">
+      <h3 id="modal-title" class="font-display text-lg tracking-tight"></h3>
+      <button id="modal-close" class="p-2 rounded-full hover:bg-white/5" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="modal-body" class="px-6 pb-6"></div>
+  </div>
+</div>
+
+<div id="toast-region" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================
+   Utilities
+   ========================================================= */
+const $  = (s,r) => (r||document).querySelector(s);
+const $$ = (s,r) => Array.from((r||document).querySelectorAll(s));
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const uid = (p='id') => `${p}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+const fmtDate = iso => new Date(iso).toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});
+const fmtDT = ts => new Date(ts).toLocaleString();
+const newCaseId = () => `#TRC-${String(248 + Math.floor(Math.random()*500)).padStart(4,'0')}`;
+
+const CATEGORIES = ['Electronics','Bags','IDs & Cards','Stationery','Clothing','Accessories','Keys','Other'];
+const LOCATIONS  = ['Main Library','Student Center','Cafeteria','Science Building','Engineering Building','Sports Complex','Main Gate','Parking Area','Other'];
+
+const STATUS_META = {
+  searching:{label:'Searching',cls:'border-mist/30 text-mist bg-mist/5'},
+  found:    {label:'Found',cls:'border-emer/40 text-emer-glow bg-emer/10'},
+  matched:  {label:'Matched',cls:'border-lime/50 text-lime bg-lime/10'},
+  received: {label:'Received',cls:'border-sky-400/40 text-sky-300 bg-sky-400/10'},
+  ready:    {label:'Ready for collection',cls:'border-lime/60 text-lime bg-lime/15'},
+  collected:{label:'Collected',cls:'border-white/20 text-cream/70 bg-white/5'}
+};
+
+/* =========================================================
+   Sample "photos" — inline SVG illustrations for each item
+   ========================================================= */
+const svg = inner => 'data:image/svg+xml;utf8,' + encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#101b17"/><stop offset="1" stop-color="#070d0a"/></linearGradient><radialGradient id="glow" cx="50%" cy="42%" r="58%"><stop offset="0" stop-color="#10A97A" stop-opacity=".22"/><stop offset="1" stop-color="#10A97A" stop-opacity="0"/></radialGradient></defs><rect width="400" height="300" fill="url(#bg)"/><rect width="400" height="300" fill="url(#glow)"/>${inner}</svg>`
+);
+
+const PHOTO = {
+  calculator: svg(`
+    <g transform="translate(140,45)">
+      <rect width="120" height="210" rx="14" fill="#1e2b25" stroke="#2d3f36" stroke-width="2"/>
+      <rect x="14" y="14" width="92" height="42" rx="6" fill="#0a5d43" stroke="#10A97A" stroke-width="1.5"/>
+      <text x="60" y="42" text-anchor="middle" fill="#4ade80" font-family="monospace" font-size="18" font-weight="bold">0.00</text>
+      ${Array.from({length:4}).map((_,r)=>Array.from({length:4}).map((_,c)=>
+        `<circle cx="${26+c*23}" cy="${78+r*30}" r="7" fill="${(r===3&&c===3)?'#10A97A':'#2d3f36'}"/>`
+      ).join('')).join('')}
+    </g>`),
+  backpack: svg(`
+    <g transform="translate(120,55)">
+      <path d="M40 10 Q40 -10 80 -10 Q120 -10 120 10 L120 15 L110 15 L110 60 Q110 80 90 80 L50 80 Q30 80 30 60 L30 15 L40 15 Z" fill="#1e2b25" stroke="#2d3f36" stroke-width="2"/>
+      <path d="M50 40 Q80 30 110 40 L110 60 Q110 75 90 75 L50 75 Q30 75 30 60 Z" fill="#243630" stroke="#2d3f36" stroke-width="1.5"/>
+      <rect x="60" y="45" width="40" height="6" rx="3" fill="#10A97A" opacity=".8"/>
+      <circle cx="130" cy="30" r="6" fill="none" stroke="#B8FF5C" stroke-width="2"/>
+    </g>`),
+  bottle: svg(`
+    <g transform="translate(165,40)">
+      <rect x="20" y="10" width="30" height="20" rx="4" fill="#2d3f36"/>
+      <rect x="15" y="30" width="40" height="180" rx="12" fill="#1e2b25" stroke="#2d3f36" stroke-width="2"/>
+      <rect x="15" y="80" width="40" height="80" fill="#0a5d43" opacity=".5"/>
+      <text x="35" y="130" text-anchor="middle" fill="#4ade80" font-family="sans-serif" font-size="11" font-weight="bold" letter-spacing="2">CAMPUS</text>
+    </g>`),
+  earbuds: svg(`
+    <g transform="translate(120,90)">
+      <rect width="80" height="80" rx="22" fill="#f5f5f0" stroke="#2d3f36" stroke-width="2"/>
+      <circle cx="40" cy="30" r="4" fill="#10A97A"/>
+      <line x1="40" y1="50" x2="40" y2="70" stroke="#d0d0c8" stroke-width="2"/>
+      <g transform="translate(105,20)">
+        <rect width="40" height="60" rx="18" fill="#f5f5f0" stroke="#2d3f36" stroke-width="2"/>
+        <circle cx="20" cy="20" r="8" fill="#1e2b25"/>
+        <rect x="14" y="38" width="12" height="18" rx="4" fill="#1e2b25"/>
+      </g>
+      <g transform="translate(-45,20)">
+        <rect width="40" height="60" rx="18" fill="#f5f5f0" stroke="#2d3f36" stroke-width="2"/>
+        <circle cx="20" cy="20" r="8" fill="#1e2b25"/>
+        <rect x="14" y="38" width="12" height="18" rx="4" fill="#1e2b25"/>
+      </g>
+    </g>`),
+  hoodie: svg(`
+    <g transform="translate(90,60)">
+      <path d="M40 20 Q60 0 80 20 L80 30 L60 40 L60 45 L60 150 L50 160 L30 160 L20 150 L20 40 L0 30 L0 20 Q20 0 40 20 Z" fill="#2c4a7a" stroke="#1e3459" stroke-width="2"/>
+      <path d="M30 40 L50 40 L50 55 L30 55 Z" fill="#1e3459"/>
+      <path d="M60 40 Q90 40 90 60 Q90 100 80 140" fill="none" stroke="#1e3459" stroke-width="3"/>
+      <line x1="40" y1="60" x2="40" y2="140" stroke="#1e3459" stroke-width="1.5" opacity=".5"/>
+      <path d="M60 110 L65 130 L70 110" fill="none" stroke="#1e3459" stroke-width="2"/>
+    </g>`),
+  idcard: svg(`
+    <g transform="translate(90,100)">
+      <rect width="220" height="100" rx="10" fill="#f5f5f0" stroke="#2d3f36" stroke-width="2"/>
+      <rect x="10" y="10" width="60" height="80" rx="4" fill="#0a5d43"/>
+      <circle cx="40" cy="40" r="14" fill="#10A97A" opacity=".5"/>
+      <text x="40" y="80" text-anchor="middle" fill="#4ade80" font-family="monospace" font-size="8">ID</text>
+      <rect x="80" y="20" width="120" height="6" rx="3" fill="#c8c8c0"/>
+      <rect x="80" y="36" width="80" height="4" rx="2" fill="#d8d8d0"/>
+      <rect x="80" y="48" width="100" height="4" rx="2" fill="#d8d8d0"/>
+      <rect x="80" y="70" width="60" height="4" rx="2" fill="#10A97A"/>
+    </g>`),
+  usb: svg(`
+    <g transform="translate(140,110)">
+      <rect x="0" y="0" width="100" height="60" rx="8" fill="#1e2b25" stroke="#2d3f36" stroke-width="2"/>
+      <rect x="100" y="20" width="20" height="20" fill="#c8c8c0" stroke="#2d3f36" stroke-width="1.5"/>
+      <rect x="0" y="25" width="100" height="6" fill="#10A97A" opacity=".7"/>
+    </g>`),
+  notebook: svg(`
+    <g transform="translate(120,70)">
+      <rect x="0" y="0" width="140" height="160" rx="6" fill="#4a4a4a" stroke="#2d3f36" stroke-width="2"/>
+      ${Array.from({length:8}).map((_,i)=>`<line x1="10" y1="${20+i*18}" x2="130" y2="${20+i*18}" stroke="#6a6a6a" stroke-width="1"/>`).join('')}
+      ${Array.from({length:6}).map((_,i)=>`<circle cx="0" cy="${20+i*25}" r="3" fill="#c8c8c0"/>`).join('')}
+    </g>`),
+  keys: svg(`
+    <g transform="translate(140,100)">
+      <circle cx="50" cy="50" r="30" fill="none" stroke="#c8c8c0" stroke-width="6"/>
+      <circle cx="50" cy="50" r="12" fill="none" stroke="#c8c8c0" stroke-width="4"/>
+      <g transform="translate(80,40)">
+        <rect width="70" height="14" rx="3" fill="#c8c8c0"/>
+        <rect x="40" y="10" width="6" height="12" fill="#c8c8c0"/>
+        <rect x="55" y="10" width="6" height="12" fill="#c8c8c0"/>
+      </g>
+      <g transform="translate(75,65) rotate(15)">
+        <rect width="60" height="12" rx="3" fill="#b0b0a8"/>
+        <rect x="35" y="8" width="5" height="10" fill="#b0b0a8"/>
+      </g>
+    </g>`),
+  earbudwireless: svg(`
+    <g transform="translate(110,90)">
+      <rect width="180" height="90" rx="20" fill="#f5f5f0" stroke="#2d3f36" stroke-width="2"/>
+      <circle cx="90" cy="70" r="3" fill="#10A97A"/>
+      <ellipse cx="55" cy="45" rx="18" ry="28" fill="#1e2b25"/>
+      <ellipse cx="125" cy="45" rx="18" ry="28" fill="#1e2b25"/>
+      <circle cx="55" cy="30" r="6" fill="#0a5d43"/>
+      <circle cx="125" cy="30" r="6" fill="#0a5d43"/>
+    </g>`),
+  pencilcase: svg(`
+    <g transform="translate(90,110)">
+      <path d="M0 30 Q0 0 30 0 L190 0 Q220 0 220 30 L220 60 Q220 90 190 90 L30 90 Q0 90 0 60 Z" fill="#e88aa8" stroke="#c96a88" stroke-width="2"/>
+      <line x1="0" y1="45" x2="220" y2="45" stroke="#c96a88" stroke-width="2" stroke-dasharray="4 4"/>
+      <circle cx="110" cy="45" r="8" fill="#c96a88"/>
+      <text x="110" y="68" text-anchor="middle" fill="#fff" font-family="sans-serif" font-size="10" opacity=".7">✿</text>
+    </g>`),
+  cable: svg(`
+    <g transform="translate(80,110)">
+      <path d="M20 40 Q80 -20 140 40 Q200 100 260 40" fill="none" stroke="#f5f5f0" stroke-width="6" stroke-linecap="round"/>
+      <rect x="0" y="30" width="30" height="20" rx="4" fill="#c8c8c0"/>
+      <rect x="260" y="30" width="30" height="20" rx="4" fill="#c8c8c0"/>
+      <circle cx="15" cy="40" r="2" fill="#0A0F0D"/>
+      <circle cx="275" cy="40" r="2" fill="#0A0F0D"/>
+    </g>`),
+  sportsbottle: svg(`
+    <g transform="translate(150,50)">
+      <rect x="25" y="0" width="50" height="30" rx="6" fill="#1a3d2e"/>
+      <rect x="30" y="-15" width="40" height="20" rx="4" fill="#0a5d43" stroke="#10A97A" stroke-width="1.5"/>
+      <path d="M15 30 Q5 40 5 70 L5 180 Q5 200 25 200 L75 200 Q95 200 95 180 L95 70 Q95 40 85 30 Z" fill="#1e6b4a" stroke="#2d3f36" stroke-width="2"/>
+      <rect x="25" y="80" width="50" height="80" fill="#0a5d43" opacity=".4"/>
+      <text x="50" y="130" text-anchor="middle" fill="#B8FF5C" font-family="monospace" font-size="12" font-weight="bold">CAMPUS</text>
+    </g>`),
+  laptopsleeve: svg(`
+    <g transform="translate(80,80)">
+      <rect width="240" height="140" rx="10" fill="#4a5258" stroke="#2d3f36" stroke-width="2"/>
+      <rect x="20" y="20" width="200" height="100" rx="4" fill="#2d353b"/>
+      <path d="M20 20 Q120 -10 220 20" fill="none" stroke="#10A97A" stroke-width="2" opacity=".6"/>
+      <circle cx="120" cy="70" r="16" fill="none" stroke="#c8c8c0" stroke-width="2"/>
+      <path d="M112 70 L120 62 L128 70 M120 62 L120 78" stroke="#c8c8c0" stroke-width="2" fill="none"/>
+    </g>`),
+  watch: svg(`
+    <g transform="translate(140,50)">
+      <path d="M40 0 L80 0 L80 30 L40 30 Z" fill="#2d3f36"/>
+      <path d="M40 170 L80 170 L80 200 L40 200 Z" fill="#2d3f36"/>
+      <circle cx="60" cy="100" r="55" fill="#c8c8c0" stroke="#2d3f36" stroke-width="3"/>
+      <circle cx="60" cy="100" r="45" fill="#f5f5f0"/>
+      ${Array.from({length:12}).map((_,i)=>{const a=i*30*Math.PI/180;return `<line x1="${60+38*Math.sin(a)}" y1="${100-38*Math.cos(a)}" x2="${60+42*Math.sin(a)}" y2="${100-42*Math.cos(a)}" stroke="#2d3f36" stroke-width="1.5"/>`;}).join('')}
+      <line x1="60" y1="100" x2="60" y2="70" stroke="#0A0F0D" stroke-width="3" stroke-linecap="round"/>
+      <line x1="60" y1="100" x2="80" y2="105" stroke="#0A0F0D" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="60" cy="100" r="3" fill="#10A97A"/>
+    </g>`)
+};
+
+/* =========================================================
+   Storage
+   ========================================================= */
+const K = { items:'tracedu.items.v1', notifications:'tracedu.notifications.v1', events:'tracedu.events.v1', seeded:'tracedu.seeded.v1' };
+const readLS = (k,f)=>{ try{const r=localStorage.getItem(k);return r?JSON.parse(r):f;}catch{return f;} };
+const writeLS = (k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch{} };
+
+const store = {
+  ensureSeeded(){
+    if (localStorage.getItem(K.seeded)) return;
+    const d = n => { const t=new Date(); t.setDate(t.getDate()-n); return t.toISOString().slice(0,10); };
+    const seed = [
+      { id:'it-01', caseId:'#TRC-0231', type:'found', title:'Black Casio Calculator', category:'Electronics', color:'Black', description:'Black Casio scientific calculator, model FX-991. Small scratch near the display.', distinctive:'Small scratch near display', hiddenDetail:'Blue sticker underneath', location:'Science Building', date:d(2), status:'found', createdAt:Date.now()-48*3600*1000, image:PHOTO.calculator },
+      { id:'it-02', caseId:'#TRC-0232', type:'found', title:'Black Backpack', category:'Bags', color:'Black', description:'Black backpack with a small keychain attached to the front zipper.', distinctive:'Silver carabiner on side strap', hiddenDetail:'Red notebook in front pocket', location:'Main Library', date:d(1), status:'ready', createdAt:Date.now()-24*3600*1000, image:PHOTO.backpack },
+      { id:'it-03', caseId:'#TRC-0233', type:'lost',  title:'Silver Water Bottle', category:'Other', color:'Silver', description:'Insulated stainless steel bottle, roughly 750ml.', location:'Sports Complex', date:d(3), status:'searching', createdAt:Date.now()-72*3600*1000, image:PHOTO.bottle },
+      { id:'it-04', caseId:'#TRC-0234', type:'found', title:'AirPods Case', category:'Electronics', color:'White', description:'White AirPods charging case, second generation.', hiddenDetail:'Small heart sticker inside lid', location:'Cafeteria', date:d(4), status:'found', createdAt:Date.now()-96*3600*1000, image:PHOTO.earbuds },
+      { id:'it-05', caseId:'#TRC-0235', type:'found', title:'Blue Hoodie', category:'Clothing', color:'Blue', description:'Navy blue hoodie, medium size.', distinctive:'Drawstring missing on left side', location:'Engineering Building', date:d(5), status:'found', createdAt:Date.now()-120*3600*1000, image:PHOTO.hoodie },
+      { id:'it-06', caseId:'#TRC-0236', type:'found', title:'Student ID Card', category:'IDs & Cards', color:'White', description:'Student ID card found near the entrance.', hiddenDetail:'Name begins with the letter M', location:'Main Gate', date:d(2), status:'received', createdAt:Date.now()-48*3600*1000, image:PHOTO.idcard },
+      { id:'it-07', caseId:'#TRC-0237', type:'lost',  title:'USB Drive', category:'Electronics', color:'Black', description:'32GB SanDisk USB drive with a small red stripe.', location:'Main Library', date:d(6), status:'searching', createdAt:Date.now()-144*3600*1000, image:PHOTO.usb },
+      { id:'it-08', caseId:'#TRC-0238', type:'found', title:'Grey Notebook', category:'Stationery', color:'Grey', description:'A5 grey notebook with grid paper.', location:'Science Building', date:d(7), status:'found', createdAt:Date.now()-168*3600*1000, image:PHOTO.notebook },
+      { id:'it-09', caseId:'#TRC-0239', type:'lost',  title:'Car Keys', category:'Keys', color:'Black', description:'Car keys on a black lanyard.', location:'Parking Area', date:d(1), status:'matched', matchScore:88, createdAt:Date.now()-24*3600*1000, image:PHOTO.keys },
+      { id:'it-10', caseId:'#TRC-0240', type:'found', title:'Wireless Earbuds', category:'Electronics', color:'White', description:'White wireless earbuds in a charging case.', hiddenDetail:'Left earbud has a tiny chip on the stem', location:'Student Center', date:d(2), status:'found', createdAt:Date.now()-48*3600*1000, image:PHOTO.earbudwireless },
+      { id:'it-11', caseId:'#TRC-0241', type:'found', title:'Pink Pencil Case', category:'Stationery', color:'Pink', description:'Pink fabric pencil case with floral pattern.', location:'Cafeteria', date:d(8), status:'found', createdAt:Date.now()-192*3600*1000, image:PHOTO.pencilcase },
+      { id:'it-12', caseId:'#TRC-0242', type:'lost',  title:'White Charging Cable', category:'Electronics', color:'White', description:'USB-C charging cable, about 1 metre.', location:'Engineering Building', date:d(2), status:'searching', createdAt:Date.now()-48*3600*1000, image:PHOTO.cable },
+      { id:'it-13', caseId:'#TRC-0243', type:'found', title:'Sports Bottle', category:'Other', color:'Green', description:'Green squeeze sports bottle with a flip cap.', location:'Sports Complex', date:d(9), status:'found', createdAt:Date.now()-216*3600*1000, image:PHOTO.sportsbottle },
+      { id:'it-14', caseId:'#TRC-0244', type:'found', title:'Laptop Sleeve', category:'Bags', color:'Grey', description:'Grey neoprene laptop sleeve, fits 14 inch laptops.', location:'Main Library', date:d(3), status:'found', createdAt:Date.now()-72*3600*1000, image:PHOTO.laptopsleeve },
+      { id:'it-15', caseId:'#TRC-0245', type:'found', title:'Wrist Watch', category:'Accessories', color:'Silver', description:'Silver analog wristwatch with leather strap.', hiddenDetail:'Engraving on the back reads 2024', location:'Student Center', date:d(4), status:'found', createdAt:Date.now()-96*3600*1000, image:PHOTO.watch }
+    ];
+    writeLS(K.items, seed);
+    writeLS(K.notifications, []);
+    writeLS(K.events, {});
+    localStorage.setItem(K.seeded, '1');
+  },
+  getItems(){return readLS(K.items,[]);},
+  setItems(items){writeLS(K.items,items);},
+  addItem(item){const l=this.getItems();l.unshift(item);this.setItems(l);},
+  updateItem(id,patch){this.setItems(this.getItems().map(i=>i.id===id?Object.assign({},i,patch):i));},
+  removeItem(id){this.setItems(this.getItems().filter(i=>i.id!==id));},
+  getNotifications(){return readLS(K.notifications,[]);},
+  setNotifications(n){writeLS(K.notifications,n);},
+  addNotification(n){const l=this.getNotifications();l.unshift(n);this.setNotifications(l);updateNotifDot();},
+  markAllRead(){this.setNotifications(this.getNotifications().map(n=>Object.assign({},n,{read:true})));updateNotifDot();},
+  getEvents(){return readLS(K.events,{});},
+  addEvent(caseId,label){const a=this.getEvents();a[caseId]=(a[caseId]||[]).concat([{label,at:Date.now()}]);writeLS(K.events,a);}
+};
+
+/* =========================================================
+   Matching
+   ========================================================= */
+const STOP = new Set(['the','a','an','and','or','of','with','for','on','in','at','to','is','it','my','i','me','this','that']);
+const tokenize = s => (s||'').toLowerCase().split(/[^a-z0-9]+/).filter(w=>w.length>1&&!STOP.has(w));
+const daysBetween = (a,b) => Math.abs(new Date(a).getTime()-new Date(b).getTime())/86400000;
+
+function scoreMatch(lost,found){
+  if (lost.type!=='lost'||found.type!=='found') return 0;
+  let s=0;
+  if (lost.category===found.category) s+=30; else s+=6;
+  const lw=new Set(tokenize(`${lost.title} ${lost.description} ${lost.brand||''}`));
+  const fw=new Set(tokenize(`${found.title} ${found.description} ${found.brand||''}`));
+  let o=0; lw.forEach(w=>{if(fw.has(w))o++;});
+  s+=Math.min(25,o*5);
+  if (lost.color&&found.color&&lost.color.toLowerCase()===found.color.toLowerCase()) s+=15;
+  else if (lost.color&&found.color) s+=4;
+  if (lost.location===found.location) s+=15; else s+=3;
+  s+=Math.max(0,15-daysBetween(lost.date,found.date)*2);
+  return Math.min(99,Math.round(s));
+}
+function findBestMatch(lost,pool){
+  let best=null;
+  for (const f of pool){
+    if (f.type!=='found') continue;
+    const s=scoreMatch(lost,f);
+    if (s>=60&&(!best||s>best.score)) best={found:f,score:s};
+  }
+  return best;
+}
+
+/* =========================================================
+   Toast / Modal
+   ========================================================= */
+function toast(title,body){
+  const el=document.createElement('div');
+  el.className='toast';
+  el.innerHTML=`<span style="width:32px;height:32px;border-radius:9999px;background:rgba(10,15,13,.25);display:flex;align-items:center;justify-content:center;flex:none;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </span><div style="flex:1;min-width:0;"><strong style="display:block;font-size:.9rem;">${esc(title)}</strong>${body?`<span style="font-size:.78rem;opacity:.85;">${esc(body)}</span>`:''}</div>`;
+  $('#toast-region').appendChild(el);
+  setTimeout(()=>{el.style.transition='opacity .3s ease, transform .3s ease';el.style.opacity='0';el.style.transform='translateY(12px)';setTimeout(()=>el.remove(),320);},3400);
+}
+
+let lastFocused=null;
+function openModal(title,html){
+  lastFocused=document.activeElement;
+  $('#modal-title').textContent=title||'';
+  $('#modal-body').innerHTML=html;
+  $('#modal-root').classList.add('is-open');
+  setTimeout(()=>{const f=$$('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',$('#modal-root'));if(f.length)f[0].focus();},50);
+}
+function closeModal(){ $('#modal-root').classList.remove('is-open'); if(lastFocused&&lastFocused.focus) lastFocused.focus(); }
+$('#modal-close').addEventListener('click',closeModal);
+$('#modal-root').addEventListener('click',e=>{ if(e.target.id==='modal-root') closeModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&$('#modal-root').classList.contains('is-open')) closeModal(); });
+
+/* =========================================================
+   Router
+   ========================================================= */
+const ROUTES=['home','browse','report-lost','report-found','item','cases','notifications','map','good-samaritan','admin'];
+let currentRoute='home', currentParam=null;
+
+function go(route,param){
+  if (ROUTES.indexOf(route)===-1) route='home';
+  currentRoute=route; currentParam=param||null;
+  window.scrollTo({top:0,behavior:reduced()?'auto':'smooth'});
+  $$('.screen').forEach(s=>s.classList.remove('is-active'));
+  const el=$('#screen-'+route); if(el) el.classList.add('is-active');
+  const hash=param?`#/${route}/${param}`:`#/${route}`;
+  if (window.location.hash!==hash) history.replaceState(null,'',hash);
+  renderRoute(); renderNav();
+}
+
+function renderRoute(){
+  switch(currentRoute){
+    case 'home': $('#home-mount').innerHTML=homeHTML(); bindCampusMap(); break;
+    case 'browse': renderBrowse(); break;
+    case 'report-lost': renderReportLost(); break;
+    case 'report-found': renderReportFound(); break;
+    case 'item': renderItem(currentParam); break;
+    case 'cases': renderCases(); break;
+    case 'notifications': renderNotifications(); break;
+    case 'map': $('#map-mount').innerHTML=mapPageHTML(); bindCampusMap(); break;
+    case 'good-samaritan': renderSamaritan(); break;
+    case 'admin': renderAdmin(); break;
+  }
+}
+
+window.addEventListener('hashchange',()=>{
+  const h=window.location.hash.replace(/^#\/?/,'');
+  const [r,p]=h.split('/');
+  if (r&&ROUTES.indexOf(r)!==-1&&(r!==currentRoute||p!==currentParam)) go(r,p);
+});
+
+/* =========================================================
+   Navbar
+   ========================================================= */
+function renderNav(){
+  const links=[
+    {r:'home',l:'Home'},{r:'browse',l:'Browse'},
+    {r:'report-lost',l:'Report Lost'},{r:'report-found',l:'Report Found'},
+    {r:'cases',l:'My Cases'}
+  ];
+  $('#desktop-nav').innerHTML=links.map(l=>
+    `<button class="px-4 py-1.5 rounded-full text-sm transition ${currentRoute===l.r?'text-emer-glow':'text-cream/80 hover:text-cream hover:bg-white/5'}" style="${currentRoute===l.r?'background:rgba(16,169,122,.15);':''}" data-nav="${l.r}">${l.l}</button>`
+  ).join('');
+  $('#mobile-nav > div').innerHTML=links.map(l=>
+    `<button class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm text-left ${currentRoute===l.r?'bg-emer/15 text-emer-glow':'hover:bg-white/5'}" data-nav="${l.r}">${l.l}</button>`
+  ).join('')+`<button class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm hover:bg-white/5 text-mist" data-nav="admin">Student Support</button>`;
+
+  const bottom=[
+    {r:'home',l:'Home',icon:'<path d="M3 11l9-8 9 8v10a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>'},
+    {r:'browse',l:'Browse',icon:'<circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'},
+    {r:'report-lost',l:'Lost',icon:'<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'},
+    {r:'report-found',l:'Found',icon:'<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'},
+    {r:'cases',l:'Cases',icon:'<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'}
+  ];
+  $('#bottom-nav .grid').innerHTML=bottom.map(b=>{
+    const active=currentRoute===b.r;
+    return `<button class="flex flex-col items-center gap-1 py-2.5 text-[10px] ${active?'text-emer-glow':'text-mist'}" data-nav="${b.r}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none">${b.icon}</svg>${b.l}</button>`;
+  }).join('');
+}
+
+document.addEventListener('click',e=>{
+  const nav=e.target.closest('[data-nav]');
+  if (nav){ go(nav.dataset.nav); $('#mobile-nav').classList.add('hidden'); }
+  const goBtn=e.target.closest('[data-go]');
+  if (goBtn) go(goBtn.dataset.go);
+  const itemLink=e.target.closest('[data-item-link]');
+  if (itemLink) go('item',itemLink.dataset.itemLink);
+});
+
+$('#nav-home').addEventListener('click',()=>go('home'));
+$('#notifications-btn').addEventListener('click',()=>go('notifications'));
+$('#profile-btn').addEventListener('click',()=>go('admin'));
+$('#mobile-menu-btn').addEventListener('click',()=>{
+  const m=$('#mobile-nav'); const open=!m.classList.contains('hidden');
+  m.classList.toggle('hidden',open);
+});
+
+function updateNotifDot(){
+  const c=store.getNotifications().filter(n=>!n.read).length;
+  $('#notif-dot').classList.toggle('hidden',c===0);
+}
+
+/* =========================================================
+   Campus Map
+   ========================================================= */
+const MAP_NODES=[
+  {id:'library',name:'Main Library',x:22,y:30,found:4,lost:1,match:2},
+  {id:'student',name:'Student Center',x:55,y:22,found:3,lost:1,match:1},
+  {id:'cafeteria',name:'Cafeteria',x:78,y:38,found:2,lost:1,match:0},
+  {id:'science',name:'Science Building',x:38,y:55,found:5,lost:2,match:3},
+  {id:'engineering',name:'Engineering Building',x:68,y:62,found:3,lost:2,match:1},
+  {id:'gate',name:'Main Gate',x:15,y:78,found:1,lost:0,match:0},
+  {id:'sports',name:'Sports Complex',x:50,y:82,found:2,lost:1,match:0},
+  {id:'parking',name:'Parking Area',x:85,y:78,found:0,lost:1,match:0}
+];
+
+function renderCampusMapHTML(opts){
+  opts=opts||{}; const compact=!!opts.compact;
+  const aspect=compact?'aspect-[4/3]':'aspect-square';
+  return `
+    <div class="relative card overflow-hidden grain ${aspect} ${compact?'demo-stage':''}" data-map-root>
+      <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" class="absolute inset-0 w-full h-full transition-transform duration-500" data-map-svg aria-label="Stylized multi-campus map">
+        <defs>
+          <radialGradient id="mapBg" cx="40%" cy="30%"><stop offset="0%" stop-color="#16201C"/><stop offset="100%" stop-color="#070B09"/></radialGradient>
+          <linearGradient id="mapPath" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10A97A55"/><stop offset="100%" stop-color="#B8FF5C22"/></linearGradient>
+        </defs>
+        <rect width="100" height="100" fill="url(#mapBg)"/>
+        ${[[8,8,22,18],[34,6,30,14],[68,10,22,16],[6,34,18,22],[30,30,26,18],[60,34,30,20],[14,62,24,18],[44,58,22,20],[72,58,20,22],[20,84,26,10],[52,86,30,8]].map(r=>`<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" rx="1.5" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="0.25"/>`).join('')}
+        <path d="M22 30 L38 55 L68 62 L78 38" stroke="url(#mapPath)" stroke-width="0.5" fill="none" stroke-dasharray="1.5 1.5"/>
+        <path d="M15 78 L22 30 M50 82 L68 62 M85 78 L78 38" stroke="url(#mapPath)" stroke-width="0.4" fill="none" stroke-dasharray="1 1.5"/>
+        ${MAP_NODES.map(n=>{
+          const color=n.match>0?'#B8FF5C':(n.lost>n.found?'#F5D547':'#10A97A');
+          return `<g data-node="${n.id}" style="cursor:pointer;">
+            <circle cx="${n.x}" cy="${n.y}" r="3" fill="${color}" opacity="0.28" class="pulse-node" style="transform-origin:${n.x}px ${n.y}px;"/>
+            <circle cx="${n.x}" cy="${n.y}" r="1.8" fill="${color}" stroke="#0A0F0D" stroke-width="0.4"/>
+          </g>`;
+        }).join('')}
+      </svg>
+      ${!compact?`<div class="absolute bottom-4 right-4 flex flex-col gap-1.5" data-map-controls>
+        <button data-map-zoom="in" class="w-9 h-9 rounded-full glass flex items-center justify-center hover:bg-white/10" aria-label="Zoom in"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button data-map-zoom="out" class="w-9 h-9 rounded-full glass flex items-center justify-center hover:bg-white/10" aria-label="Zoom out"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button data-map-zoom="reset" class="w-9 h-9 rounded-full glass flex items-center justify-center hover:bg-white/10" aria-label="Reset zoom"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>`:''}
+      <div class="absolute top-4 left-4 flex flex-col gap-1.5 text-[10px] text-mist">
+        <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#10A97A;"></span>FOUND</span>
+        <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#F5D547;"></span>LOST</span>
+        <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#B8FF5C;"></span>POSSIBLE MATCH</span>
+      </div>
+      <div data-map-preview class="hidden absolute left-4 bottom-4 right-4 sm:right-auto sm:w-72 glass rounded-2xl p-4 animate-rise"></div>
+    </div>`;
+}
+
+function bindCampusMap(){
+  const root=$('[data-map-root]'); if(!root) return;
+  const svgEl=$('[data-map-svg]',root), preview=$('[data-map-preview]',root);
+  let zoom=1;
+  $$('[data-node]',root).forEach(g=>{
+    g.addEventListener('click',()=>{
+      const n=MAP_NODES.find(x=>x.id===g.dataset.node); if(!n) return;
+      preview.classList.remove('hidden');
+      preview.innerHTML=`
+        <div class="flex items-center gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="color:#28D9A0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><p class="font-medium text-sm">${esc(n.name)}</p></div>
+        <p class="text-xs text-mist mt-2">${n.found+n.lost} items reported here</p>
+        <div class="mt-3 grid grid-cols-3 gap-2 text-center text-[11px]">
+          <div><p class="font-semibold text-sm" style="color:#28D9A0;">${n.found}</p><p class="text-mist">Found</p></div>
+          <div><p class="font-semibold text-sm" style="color:#F5D547;">${n.lost}</p><p class="text-mist">Lost</p></div>
+          <div><p class="font-semibold text-sm" style="color:#B8FF5C;">${n.match}</p><p class="text-mist">Match</p></div>
+        </div>
+        <button class="btn btn-ghost w-full mt-4 justify-center" data-map-view="${esc(n.name)}">View items</button>`;
+      const vb=preview.querySelector('[data-map-view]');
+      if(vb) vb.addEventListener('click',()=>{
+        go('browse');
+        setTimeout(()=>{ const inp=$('#search-input'); if(inp){ inp.value=n.name; inp.dispatchEvent(new Event('input')); } },100);
+      });
+    });
+  });
+  $$('[data-map-zoom]',root).forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const a=btn.dataset.mapZoom;
+      if (a==='in') zoom=Math.min(2,zoom+0.2);
+      else if (a==='out') zoom=Math.max(0.6,zoom-0.2);
+      else zoom=1;
+      svgEl.style.transform=`scale(${zoom})`;
+    });
+  });
+}
+
+/* =========================================================
+   Home
+   ========================================================= */
+function homeHTML(){
+  return `
+    <div class="relative overflow-hidden">
+      <div class="max-w-7xl mx-auto px-5 lg:px-8 pt-10 lg:pt-20 pb-16 lg:pb-24 grid lg:grid-cols-12 gap-10 lg:gap-14">
+        <div class="lg:col-span-6 xl:col-span-5 flex flex-col justify-center">
+          <div class="flex items-center gap-3 text-[11px] tracking-[0.25em] text-mist uppercase">
+            <span class="w-8 h-px" style="background:rgba(16,169,122,.5);"></span> For university students · every campus
+          </div>
+          <h1 class="mt-6 font-display font-bold tracking-[-0.03em] leading-[0.95] text-[44px] sm:text-[64px] lg:text-[80px]">
+            LOST SOMETHING?<br/><span style="color:#28D9A0;">LET'S FIND IT.</span>
+          </h1>
+          <p class="mt-6 text-mist max-w-md text-[15px] leading-relaxed">
+            One shared lost-and-found for university students — across every campus, every building, every faculty. Report it, search it, and let TRACEDU connect it back to you.
+          </p>
+
+          <!-- Multi-campus trust strip -->
+          <div class="mt-6 flex flex-wrap items-center gap-2">
+            <span class="campus-pill"><span class="campus-dot"></span>UAEU</span>
+            <span class="campus-pill"><span class="campus-dot" style="background:#5B9BD5;"></span>Khalifa University</span>
+            <span class="campus-pill"><span class="campus-dot" style="background:#E9C46A;"></span>AUS</span>
+            <span class="campus-pill"><span class="campus-dot" style="background:#E76F51;"></span>NYU Abu Dhabi</span>
+            <span class="campus-pill"><span class="campus-dot" style="background:#8BA399;"></span>+ your campus</span>
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <button class="btn btn-primary" data-go="browse">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Find an item
+            </button>
+            <button class="btn btn-ghost" data-go="report-lost">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Report something lost
+            </button>
+          </div>
+          <button class="mt-4 inline-flex items-center gap-2 text-sm self-start" style="color:#28D9A0;" data-go="report-found">
+            I found something
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+
+          <div class="mt-8 card p-4 flex items-center gap-4 relative overflow-hidden" style="border-color:rgba(184,255,92,.3);background:linear-gradient(135deg,rgba(184,255,92,.06),transparent);">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-none" style="background:rgba(184,255,92,.15);color:#B8FF5C;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-sm">See the full workflow in 90 seconds.</p>
+              <p class="text-mist text-xs mt-0.5">A guided sample run: report → match → verify → Student Support → collection.</p>
+            </div>
+            <button class="btn btn-lime text-xs flex-none" id="home-demo-btn">Start</button>
+          </div>
+
+          <div class="mt-10 grid grid-cols-3 gap-6 max-w-md">
+            <div><p class="font-display text-3xl sm:text-4xl tracking-tight">342</p><p class="text-mist text-xs mt-1">Items reported</p></div>
+            <div><p class="font-display text-3xl sm:text-4xl tracking-tight">218</p><p class="text-mist text-xs mt-1">Items reunited</p></div>
+            <div><p class="font-display text-3xl sm:text-4xl tracking-tight">47</p><p class="text-mist text-xs mt-1">Waiting collection</p></div>
+          </div>
+          <p class="text-[10px] text-mist/60 mt-3">Sample statistics across campuses · for demonstration.</p>
+        </div>
+
+        <div class="lg:col-span-6 xl:col-span-7">${renderCampusMapHTML({compact:true})}</div>
+      </div>
+    </div>
+
+    <!-- Multi-campus callout -->
+    <section class="max-w-7xl mx-auto px-5 lg:px-8 pt-6">
+      <div class="card p-6 sm:p-8 relative overflow-hidden" style="border-color:rgba(16,169,122,.22);background:linear-gradient(135deg,rgba(16,169,122,.06),transparent 60%);">
+        <div class="grid md:grid-cols-[auto_1fr] gap-5 items-center">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-none" style="background:rgba(16,169,122,.15);border:1px solid rgba(16,169,122,.35);color:#28D9A0;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <p class="label mb-1">Built for university students, everywhere</p>
+            <p class="font-display text-xl sm:text-2xl tracking-tight leading-snug">One account. Every campus you belong to.</p>
+            <p class="text-mist text-sm mt-2 max-w-2xl">Whether you're on the main campus, a satellite campus, or a partner university abroad, TRACEDU connects your lost reports with found items — no matter which building, which faculty, or which university they turn up in.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-5 lg:px-8 py-20">
+      <p class="label">How it works</p>
+      <h2 class="font-display text-3xl sm:text-4xl tracking-tight">Four steps. One quiet reunion.</h2>
+      <div class="mt-12 grid gap-4 md:grid-cols-4 relative">
+        <div class="hidden md:block absolute top-8 left-[12.5%] right-[12.5%] h-px" style="background:linear-gradient(to right, transparent, rgba(16,169,122,.4), transparent);"></div>
+        ${[
+          {n:'01',t:'REPORT',d:'Tell us what you lost or found — from any campus.',i:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z M14 2v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'},
+          {n:'02',t:'MATCH',d:'TRACEDU compares reports across campuses for possible matches.',i:'<path d="M12 2l1.8 5.6H20l-4.8 3.6 1.8 5.8L12 13.4 7 17l1.8-5.8L4 7.6h6.2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>'},
+          {n:'03',t:'VERIFY',d:'Ownership is confirmed securely.',i:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'},
+          {n:'04',t:'REUNITE',d:'Student Support hands it back — wherever you are.',i:'<path d="M3 11l9-8 9 8v10a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 22V12h6v10" stroke="currentColor" stroke-width="2"/>'}
+        ].map(s=>`
+          <div class="relative card p-6 card-hover">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background:rgba(16,169,122,.1);border:1px solid rgba(16,169,122,.3);color:#28D9A0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">${s.i}</svg>
+            </div>
+            <p class="mt-5 text-[11px] tracking-[0.25em] text-mist">${s.n}</p>
+            <p class="font-display text-xl mt-1 tracking-tight">${s.t}</p>
+            <p class="text-mist text-sm mt-2">${s.d}</p>
+          </div>`).join('')}
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-5 lg:px-8 py-10">
+      <div class="card p-8 sm:p-12 relative overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full pointer-events-none" style="background:rgba(16,169,122,.1);filter:blur(60px);"></div>
+        <div class="relative grid md:grid-cols-2 gap-8 items-center">
+          <div>
+            <p class="label">Good Samaritan</p>
+            <h3 class="font-display text-3xl sm:text-4xl tracking-tight mt-2">People who help.</h3>
+            <p class="text-mist mt-3 max-w-md">A little honesty goes a long way. Anonymous students returning items every week — across every campus.</p>
+            <button class="btn btn-primary mt-6" data-go="good-samaritan">See the wall
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <div class="space-y-3">
+            ${['Returned a wallet','Returned a calculator','Returned headphones'].map(t=>`
+              <div class="glass rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <div class="flex gap-0.5 mb-1" style="color:#B8FF5C;">${'<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>'.repeat(5)}</div>
+                  <p class="text-sm text-cream/80">Anonymous Student</p>
+                </div>
+                <p class="text-sm text-mist">${t}</p>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </section>`;
+}
+
+/* =========================================================
+   Browse
+   ========================================================= */
+const browseState={query:'',status:'all',category:'all',location:'all',sort:'newest',items:[],loading:true};
+
+function renderBrowse(){
+  const mount=$('#browse-mount');
+  mount.innerHTML=`
+    <div class="max-w-3xl">
+      <p class="label">Browse</p>
+      <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1]">Every campus is <span style="color:#28D9A0;">talking.</span></h1>
+      <p class="text-mist mt-4">Browse items reported lost or found by university students across every campus.</p>
+    </div>
+    <div class="mt-8 max-w-3xl">
+      <div class="relative flex items-center">
+        <svg class="absolute left-5" style="color:#28D9A0;" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="search-input" type="search" placeholder="What are you looking for?" class="w-full pl-14 pr-14 py-5 text-lg rounded-2xl outline-none transition" style="background:rgba(14,20,18,.7);border:1px solid rgba(255,255,255,.08);color:#F5F3EE;" aria-label="Search items"/>
+      </div>
+      <div class="mt-3 flex flex-wrap gap-2 text-xs text-mist items-center">
+        <span class="py-1">Try:</span>
+        ${['backpack','calculator','AirPods','water bottle','student ID'].map(e=>`<button class="search-example px-2.5 py-1 rounded-full border border-white/10 hover:border-emer/50 transition" style="color:#8BA399;">${e}</button>`).join('')}
+      </div>
+    </div>
+    <div class="mt-10 grid lg:grid-cols-[260px_1fr] gap-8">
+      <aside class="hidden lg:block"><div class="card p-5 sticky top-24"><p class="font-display tracking-tight mb-5">Filters</p><div id="filter-desktop"></div></div></aside>
+      <div>
+        <div class="flex items-center justify-between mb-4 gap-3">
+          <p id="browse-count" class="text-sm text-mist">Searching…</p>
+          <button id="open-filter-drawer" class="lg:hidden btn btn-ghost">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M6 12h12M10 18h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Filters
+          </button>
+        </div>
+        <div id="browse-grid" class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3"></div>
+        <div id="browse-empty" class="hidden card p-16 text-center">
+          <p class="font-display text-2xl">No lost items here.</p>
+          <p class="text-mist mt-2">Looks like every campus is having a good day.</p>
+        </div>
+      </div>
+    </div>`;
+
+  $('#search-input').value=browseState.query;
+  $('#browse-grid').innerHTML=Array.from({length:6}).map(()=>`<div class="skeleton h-72"></div>`).join('');
+  $('#browse-count').textContent='Searching…';
+  $('#browse-empty').classList.add('hidden');
+
+  $('#search-input').addEventListener('input',e=>{ browseState.query=e.target.value; applyBrowse(); });
+  $$('.search-example',mount).forEach(b=>b.addEventListener('click',()=>{ const i=$('#search-input'); i.value=b.textContent.trim(); browseState.query=i.value; applyBrowse(); }));
+  $('#open-filter-drawer').addEventListener('click',openFilterDrawer);
+
+  setTimeout(()=>{
+    browseState.items=store.getItems();
+    browseState.loading=false;
+    renderBrowseFilters();
+    applyBrowse();
+  },250);
+}
+
+function renderBrowseFilters(){
+  const statuses=[{v:'all',l:'All'},{v:'searching',l:'Lost'},{v:'found',l:'Found'},{v:'matched',l:'Matched'},{v:'ready',l:'Ready'}];
+  const html=`
+    <div class="space-y-6">
+      <div><span class="label">Status</span><div class="flex flex-wrap gap-2">${statuses.map(s=>`<button class="chip ${browseState.status===s.v?'border-emer text-emer-glow bg-emer/10':'border-white/10 text-mist hover:border-white/20'}" data-f-status="${s.v}">${s.l}</button>`).join('')}</div></div>
+      <div><span class="label">Category</span><div class="flex flex-wrap gap-2">
+        <button class="chip ${browseState.category==='all'?'border-emer text-emer-glow bg-emer/10':'border-white/10 text-mist'}" data-f-cat="all">All</button>
+        ${CATEGORIES.map(c=>`<button class="chip ${browseState.category===c?'border-emer text-emer-glow bg-emer/10':'border-white/10 text-mist hover:border-white/20'}" data-f-cat="${esc(c)}">${esc(c)}</button>`).join('')}
+      </div></div>
+      <div><span class="label">Location</span><select class="field" data-f-location><option value="all">All locations</option>${LOCATIONS.map(l=>`<option value="${esc(l)}" ${browseState.location===l?'selected':''}>${esc(l)}</option>`).join('')}</select></div>
+      <div><span class="label">Sort</span><select class="field" data-f-sort>
+        <option value="newest" ${browseState.sort==='newest'?'selected':''}>Newest</option>
+        <option value="relevant" ${browseState.sort==='relevant'?'selected':''}>Most relevant</option>
+        <option value="nearest" ${browseState.sort==='nearest'?'selected':''}>Nearest match</option>
+      </select></div>
+    </div>`;
+  $('#filter-desktop').innerHTML=html;
+  bindFilterEvents($('#filter-desktop'));
+}
+
+function bindFilterEvents(root){
+  $$('[data-f-status]',root).forEach(b=>b.addEventListener('click',()=>{ browseState.status=b.dataset.fStatus; renderBrowseFilters(); applyBrowse(); }));
+  $$('[data-f-cat]',root).forEach(b=>b.addEventListener('click',()=>{ browseState.category=b.dataset.fCat; renderBrowseFilters(); applyBrowse(); }));
+  const loc=$('[data-f-location]',root); if(loc) loc.addEventListener('change',e=>{ browseState.location=e.target.value; applyBrowse(); });
+  const sort=$('[data-f-sort]',root); if(sort) sort.addEventListener('change',e=>{ browseState.sort=e.target.value; applyBrowse(); });
+}
+
+function openFilterDrawer(){
+  const html=`
+    <div class="space-y-6">
+      <div><span class="label">Status</span><div class="flex flex-wrap gap-2">${[{v:'all',l:'All'},{v:'searching',l:'Lost'},{v:'found',l:'Found'},{v:'matched',l:'Matched'},{v:'ready',l:'Ready'}].map(s=>`<button class="chip ${browseState.status===s.v?'border-emer text-emer-glow bg-emer/10':'border-white/10 text-mist'}" data-f-status="${s.v}">${s.l}</button>`).join('')}</div></div>
+      <div><span class="label">Category</span><div class="flex flex-wrap gap-2">
+        <button class="chip ${browseState.category==='all'?'border-emer text-emer-glow bg-emer/10':'border-white/10 text-mist'}" data-f-cat="all">All</button>
+        ${CATEGORIES.map(c=>`<button class="chip ${browseState.category===c?'border-emer text-emer-glow bg-emer/10':'border-white/10 text-mist'}" data-f-cat="${esc(c)}">${esc(c)}</button>`).join('')}
+      </div></div>
+      <div><span class="label">Location</span><select class="field" data-f-location><option value="all">All locations</option>${LOCATIONS.map(l=>`<option value="${esc(l)}" ${browseState.location===l?'selected':''}>${esc(l)}</option>`).join('')}</select></div>
+      <div><span class="label">Sort</span><select class="field" data-f-sort>
+        <option value="newest" ${browseState.sort==='newest'?'selected':''}>Newest</option>
+        <option value="relevant" ${browseState.sort==='relevant'?'selected':''}>Most relevant</option>
+        <option value="nearest" ${browseState.sort==='nearest'?'selected':''}>Nearest match</option>
+      </select></div>
+    </div>
+    <button class="btn btn-primary w-full mt-6 justify-center" id="drawer-done">Show items</button>`;
+  openModal('Filters',html);
+  bindFilterEvents($('#modal-body'));
+  $('#drawer-done').addEventListener('click',()=>{ closeModal(); applyBrowse(); });
+}
+
+function applyBrowse(){
+  let list=browseState.items.slice();
+  const q=browseState.query.trim().toLowerCase();
+  if (q) list=list.filter(i=>i.title.toLowerCase().includes(q)||i.description.toLowerCase().includes(q)||i.category.toLowerCase().includes(q)||i.location.toLowerCase().includes(q));
+  if (browseState.status!=='all'){
+    if (browseState.status==='searching') list=list.filter(i=>i.type==='lost'||i.status==='searching');
+    else if (browseState.status==='found') list=list.filter(i=>i.type==='found'&&i.status==='found');
+    else list=list.filter(i=>i.status===browseState.status);
+  }
+  if (browseState.category!=='all') list=list.filter(i=>i.category===browseState.category);
+  if (browseState.location!=='all') list=list.filter(i=>i.location===browseState.location);
+  if (browseState.sort==='newest') list.sort((a,b)=>b.createdAt-a.createdAt);
+  else if (browseState.sort==='nearest') list.sort((a,b)=>(b.matchScore||0)-(a.matchScore||0));
+  else list.sort((a,b)=>a.title.localeCompare(b.title));
+
+  const grid=$('#browse-grid'), empty=$('#browse-empty');
+  $('#browse-count').textContent=`${list.length} item${list.length===1?'':'s'}`;
+  if (list.length===0){ grid.innerHTML=''; empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+  grid.innerHTML=list.map((i,idx)=>itemCardHTML(i,idx)).join('');
+}
+
+function itemCardHTML(item,idx){
+  const st=STATUS_META[item.status]||STATUS_META.searching;
+  const thumb=item.image
+    ?`<img src="${item.image}" alt="${esc(item.title)}" class="w-full h-full object-cover group-hover:scale-[1.03] transition duration-500"/>`
+    :`<div class="w-full h-full flex items-center justify-center" style="background:linear-gradient(135deg,#0E1412,#111815,#070B09);"><span class="text-5xl">📦</span></div>`;
+  return `
+    <article class="card card-hover overflow-hidden group cursor-pointer" data-item-link="${item.id}" style="animation:rise .5s cubic-bezier(.16,1,.3,1) ${(idx||0)*25}ms both;">
+      <div class="relative aspect-[4/3] overflow-hidden">
+        ${thumb}
+        <div class="absolute top-3 left-3 flex gap-2 flex-wrap">
+          <span class="chip ${st.cls}">${st.label}</span>
+          ${item.matchScore?`<span class="chip border-lime/60 text-lime bg-ink/70 backdrop-blur">Match ${item.matchScore}%</span>`:''}
+        </div>
+      </div>
+      <div class="p-4">
+        <h3 class="font-display text-[17px] tracking-tight leading-snug">${esc(item.title)}</h3>
+        <div class="mt-2 flex items-center gap-3 text-xs text-mist flex-wrap">
+          <span>${esc(item.location)}</span><span>·</span><span>${fmtDate(item.date)}</span>
+        </div>
+        <div class="mt-4 flex items-center justify-between text-sm">
+          <span class="text-mist">${esc(item.category)}</span>
+          <span class="inline-flex items-center gap-1" style="color:#28D9A0;">View item
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H8M17 7v9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </div>
+      </div>
+    </article>`;
+}
+
+/* =========================================================
+   Report Lost
+   ========================================================= */
+let rlStep=0, rlForm=null, rlDone=null;
+function resetRL(){ rlStep=0; rlForm={image:undefined,title:'',category:'Electronics',color:'',brand:'',description:'',distinctive:'',location:'Main Library',date:new Date().toISOString().slice(0,10),time:'12:00'}; rlDone=null; }
+
+function renderReportLost(){
+  const mount=$('#report-lost-mount');
+  if (rlDone){
+    mount.innerHTML=`
+      <div class="card p-8 sm:p-12 text-center relative overflow-hidden animate-rise">
+        <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full pointer-events-none" style="background:rgba(16,169,122,.15);filter:blur(60px);"></div>
+        <div class="relative">
+          <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center" style="background:rgba(16,169,122,.15);border:1px solid rgba(16,169,122,.4);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="color:#28D9A0;"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <p class="mt-6 label">Case opened</p>
+          <h1 class="font-display text-4xl sm:text-5xl tracking-tight">CASE OPENED.</h1>
+          <p class="mt-3 text-mist">Case number</p>
+          <p class="font-display text-2xl tracking-tight" style="color:#28D9A0;">${esc(rlDone.caseId)}</p>
+          <p class="mt-5 text-mist max-w-sm mx-auto">We'll keep looking across every campus. If a similar found item appears, you'll get a notification.</p>
+          <div class="mt-8 flex flex-wrap gap-3 justify-center">
+            <button class="btn btn-primary" data-go="cases">Track my case</button>
+            <button class="btn btn-ghost" data-go="browse">Browse items</button>
+          </div>
+        </div>
+      </div>
+      ${rlDone.match?`<div class="mt-8 animate-rise">
+        <div class="mb-4 flex items-center gap-2 text-sm" style="color:#B8FF5C;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l1.8 5.6H20l-4.8 3.6 1.8 5.8L12 13.4 7 17l1.8-5.8L4 7.6h6.2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          We found a possible match while you submitted.
+        </div>
+        ${matchCardHTML(rlDone.score,rlDone.lost,rlDone.match)}
+      </div>`:''}`;
+    return;
+  }
+
+  const steps=['Item','Details','Location','Review'];
+  mount.innerHTML=`
+    <p class="label">Report lost</p>
+    <h1 class="font-display text-4xl sm:text-5xl tracking-tight">Help us find it.</h1>
+    <p class="text-mist mt-3">A few details so we can start looking — across every campus.</p>
+    <div class="mt-10 flex items-center gap-3 overflow-x-auto pb-1">
+      ${steps.map((s,i)=>`
+        <div class="flex items-center gap-3 shrink-0">
+          <div class="flex items-center gap-2 text-xs tracking-widest uppercase ${i===rlStep?'text-emer-glow':(i<rlStep?'text-cream/70':'text-mist')}">
+            <span class="trail-dot ${i===rlStep?'is-current':(i<rlStep?'is-done':'')}">
+              ${i<rlStep?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>':`0${i+1}`}
+            </span>
+            <span class="hidden sm:inline">${s}</span>
+          </div>
+          ${i<steps.length-1?`<span class="w-6 h-px" style="${i<rlStep?'background:rgba(16,169,122,.5);':'background:rgba(255,255,255,.1);'}"></span>`:''}
+        </div>`).join('')}
+    </div>
+    <div class="mt-10 card p-6 sm:p-8" id="rl-step-body"></div>`;
+  renderRLStep();
+}
+
+function renderRLStep(){
+  const body=$('#rl-step-body'); if(!body) return;
+  if (rlStep===0){
+    body.innerHTML=`<h2 class="font-display text-xl mb-5">Upload a photo <span class="text-mist text-sm font-sans font-normal">(optional, helps matching)</span></h2><div id="rl-upload"></div>`;
+    renderFileUploader($('#rl-upload'),rlForm.image,v=>{ rlForm.image=v; renderRLStep(); });
+  } else if (rlStep===1){
+    body.innerHTML=`
+      <div class="space-y-5">
+        <div><label class="label" for="rl-title">Item name</label><input id="rl-title" class="field" placeholder="e.g. Black Casio calculator" value="${esc(rlForm.title)}"/></div>
+        <div class="grid sm:grid-cols-2 gap-5">
+          <div><label class="label" for="rl-cat">Category</label><select id="rl-cat" class="field">${CATEGORIES.map(c=>`<option ${c===rlForm.category?'selected':''}>${c}</option>`).join('')}</select></div>
+          <div><label class="label" for="rl-color">Colour</label><input id="rl-color" class="field" placeholder="e.g. Black" value="${esc(rlForm.color)}"/></div>
+        </div>
+        <div><label class="label" for="rl-brand">Brand <span class="text-mist normal-case tracking-normal">(optional)</span></label><input id="rl-brand" class="field" placeholder="e.g. Casio" value="${esc(rlForm.brand)}"/></div>
+        <div><label class="label" for="rl-dist">Distinctive features</label><input id="rl-dist" class="field" placeholder="e.g. Small scratch near the display" value="${esc(rlForm.distinctive)}"/></div>
+        <div><label class="label" for="rl-desc">Description</label><textarea id="rl-desc" rows="4" class="field" placeholder="Black Casio calculator with a small scratch near the display.">${esc(rlForm.description)}</textarea></div>
+      </div>
+      <div class="mt-8 flex items-center justify-between gap-3">
+        <button class="btn btn-ghost" data-rl-back>Back</button>
+        <button class="btn btn-primary" data-rl-next>Continue →</button>
+      </div>`;
+    bindRLNav();
+  } else if (rlStep===2){
+    body.innerHTML=`
+      <div class="space-y-5">
+        <div><label class="label" for="rl-loc">Where did you last see it?</label><select id="rl-loc" class="field">${LOCATIONS.map(l=>`<option ${l===rlForm.location?'selected':''}>${l}</option>`).join('')}</select></div>
+        <div class="grid sm:grid-cols-2 gap-5">
+          <div><label class="label" for="rl-date">Date</label><input id="rl-date" type="date" class="field" value="${rlForm.date}"/></div>
+          <div><label class="label" for="rl-time">Approximate time</label><input id="rl-time" type="time" class="field" value="${rlForm.time}"/></div>
+        </div>
+      </div>
+      <div class="mt-8 flex items-center justify-between gap-3">
+        <button class="btn btn-ghost" data-rl-back>Back</button>
+        <button class="btn btn-primary" data-rl-next>Continue →</button>
+      </div>`;
+    bindRLNav();
+  } else {
+    body.innerHTML=`
+      <h2 class="font-display text-xl mb-4">Review</h2>
+      ${rlForm.image?`<img src="${rlForm.image}" alt="preview" class="w-full h-40 object-cover rounded-2xl mb-4"/>`:''}
+      ${[['Item name',rlForm.title||'—'],['Category',rlForm.category],['Colour',rlForm.color||'—'],['Brand',rlForm.brand||'—'],['Distinctive',rlForm.distinctive||'—'],['Description',rlForm.description||'—'],['Location',rlForm.location],['Date',rlForm.date]].map(([k,v])=>`
+        <div class="flex justify-between gap-4 py-2.5" style="border-bottom:1px solid rgba(255,255,255,.06);"><span class="text-mist text-sm">${k}</span><span class="text-sm text-right max-w-[60%]">${esc(v)}</span></div>`).join('')}
+      <div class="mt-8 flex items-center justify-between gap-3">
+        <button class="btn btn-ghost" data-rl-back>Back</button>
+        <button class="btn btn-primary" data-rl-submit>Submit lost report</button>
+      </div>`;
+    bindRLNav();
+  }
+}
+
+function bindRLNav(){
+  const b=$('[data-rl-back]'); if(b) b.addEventListener('click',()=>{ collectRL(); rlStep=Math.max(0,rlStep-1); renderRLStep(); });
+  const n=$('[data-rl-next]'); if(n) n.addEventListener('click',()=>{
+    collectRL();
+    if (rlStep===1&&(!rlForm.title.trim()||!rlForm.description.trim())){ toast('Missing details','Add an item name and description.'); return; }
+    rlStep++; renderRLStep();
+  });
+  const s=$('[data-rl-submit]'); if(s) s.addEventListener('click',submitLost);
+}
+
+function collectRL(){
+  const set=(id,k)=>{const el=$(id); if(el) rlForm[k]=el.value;};
+  set('#rl-title','title'); set('#rl-cat','category'); set('#rl-color','color');
+  set('#rl-brand','brand'); set('#rl-dist','distinctive'); set('#rl-desc','description');
+  set('#rl-loc','location'); set('#rl-date','date'); set('#rl-time','time');
+}
+
+function submitLost(){
+  collectRL();
+  const caseId=newCaseId();
+  const item={ id:uid('lost'),caseId,type:'lost',title:rlForm.title.trim(),category:rlForm.category,color:rlForm.color.trim()||'—',brand:rlForm.brand.trim()||undefined,description:rlForm.description.trim(),distinctive:rlForm.distinctive.trim()||undefined,location:rlForm.location,date:rlForm.date,status:'searching',image:rlForm.image,createdAt:Date.now() };
+  const best=findBestMatch(item,store.getItems());
+  if (best){
+    item.status='matched'; item.matchScore=best.score; item.matchId=best.found.id;
+    store.updateItem(best.found.id,{status:'matched',matchScore:best.score,matchId:item.id});
+    store.addEvent(caseId,'Reported'); store.addEvent(caseId,'Possible match found');
+    store.addNotification({id:uid('n'),type:'match',title:'Possible match found',body:`Your ${item.title.toLowerCase()} may have been found.`,caseId,date:Date.now(),read:false});
+  } else { store.addEvent(caseId,'Reported'); }
+  store.addItem(item);
+  rlDone={caseId,match:best?best.found:null,score:best?best.score:0,lost:item};
+  toast('Case opened',caseId);
+  renderReportLost();
+}
+
+/* =========================================================
+   Report Found
+   ========================================================= */
+let rfForm=null, rfDone=null;
+function resetRF(){ rfForm={image:undefined,title:'',category:'Electronics',color:'',description:'',identifying:'',location:'Main Library',date:new Date().toISOString().slice(0,10)}; rfDone=null; }
+
+function renderReportFound(){
+  const mount=$('#report-found-mount');
+  if (rfDone){
+    mount.innerHTML=`
+      <div class="card p-8 sm:p-12 text-center relative overflow-hidden animate-rise">
+        <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full pointer-events-none" style="background:rgba(184,255,92,.1);filter:blur(60px);"></div>
+        <div class="relative">
+          <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center" style="background:rgba(184,255,92,.15);border:1px solid rgba(184,255,92,.4);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="color:#B8FF5C;"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h1 class="mt-6 font-display text-4xl sm:text-5xl tracking-tight">THANK YOU.</h1>
+          <p class="mt-3 text-mist">This item has been added to the campus-wide search.</p>
+          <p class="mt-6 font-display text-lg">Case ${esc(rfDone.caseId)}</p>
+          ${rfDone.match?`<div class="mt-8 text-left animate-rise">
+            <div class="chip border-lime/60 text-lime bg-lime/10 inline-flex items-center gap-1 mb-4">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2l1.8 5.6H20l-4.8 3.6 1.8 5.8L12 13.4 7 17l1.8-5.8L4 7.6h6.2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              Wait… we found a possible match
+            </div>
+            <div class="card p-5">
+              <div class="flex items-center justify-between gap-3 flex-wrap">
+                <div><p class="text-mist text-xs uppercase tracking-widest">Match</p><p class="font-display text-4xl" style="color:#B8FF5C;">${rfDone.score}%</p></div>
+                <button class="btn btn-lime" data-item-link="${rfDone.match.id}">View possible match</button>
+              </div>
+              <p class="text-sm text-mist mt-4">Lost report: <span style="color:#F5F3EE;">${esc(rfDone.match.title)}</span> — ${esc(rfDone.match.location)}</p>
+            </div>
+          </div>`:''}
+          <div class="mt-8 flex flex-wrap gap-3 justify-center">
+            <button class="btn btn-primary" data-go="browse">Back to browse</button>
+            <button class="btn btn-ghost" id="rf-again">Report another</button>
+          </div>
+        </div>
+      </div>`;
+    const a=$('#rf-again'); if(a) a.addEventListener('click',()=>{ resetRF(); renderReportFound(); });
+    return;
+  }
+
+  mount.innerHTML=`
+    <p class="label">Report found</p>
+    <h1 class="font-display text-4xl sm:text-5xl tracking-tight leading-[1]">You found something.<br/><span style="color:#28D9A0;">Nice.</span></h1>
+    <p class="text-mist mt-3">Help us get it back to its owner — on this campus or another.</p>
+    <form class="mt-10 card p-6 sm:p-8 space-y-6" id="rf-form">
+      <div id="rf-upload"></div>
+      <div><label class="label" for="rf-title">Item name</label><input id="rf-title" class="field" required placeholder="e.g. Black backpack"/></div>
+      <div class="grid sm:grid-cols-2 gap-5">
+        <div><label class="label" for="rf-cat">Category</label><select id="rf-cat" class="field">${CATEGORIES.map(c=>`<option>${c}</option>`).join('')}</select></div>
+        <div><label class="label" for="rf-color">Colour</label><input id="rf-color" class="field" placeholder="e.g. Black"/></div>
+      </div>
+      <div><label class="label" for="rf-desc">Description</label><textarea id="rf-desc" rows="3" class="field" required placeholder="Black backpack with a small keychain attached."></textarea></div>
+      <div>
+        <label class="label" for="rf-ident">Any identifying detail? <span class="text-mist normal-case tracking-normal">(kept private)</span></label>
+        <input id="rf-ident" class="field" placeholder="e.g. Small blue sticker underneath"/>
+        <p class="text-[11px] text-mist mt-2">Some item details are hidden to protect ownership verification.</p>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-5">
+        <div><label class="label" for="rf-loc">Where did you find it?</label><select id="rf-loc" class="field">${LOCATIONS.map(l=>`<option>${l}</option>`).join('')}</select></div>
+        <div><label class="label" for="rf-date">When did you find it?</label><input id="rf-date" type="date" class="field" value="${new Date().toISOString().slice(0,10)}"/></div>
+      </div>
+      <button type="submit" class="btn btn-primary w-full justify-center">Submit found report</button>
+    </form>`;
+
+  renderFileUploader($('#rf-upload'),rfForm.image,v=>{ rfForm.image=v; });
+  $('#rf-form').addEventListener('submit',e=>{ e.preventDefault(); submitFound(); });
+}
+
+function submitFound(){
+  const title=$('#rf-title').value.trim();
+  const desc=$('#rf-desc').value.trim();
+  if (!title||!desc){ toast('Almost there','Please add a name and description.'); return; }
+  const caseId=newCaseId();
+  const item={ id:uid('found'),caseId,type:'found',title,category:$('#rf-cat').value,color:$('#rf-color').value.trim()||'—',description:desc,hiddenDetail:$('#rf-ident').value.trim()||undefined,location:$('#rf-loc').value,date:$('#rf-date').value,status:'found',image:rfForm.image,createdAt:Date.now() };
+
+  let bestLost=null;
+  for (const lost of store.getItems().filter(i=>i.type==='lost')){
+    const s=scoreMatch(lost,item);
+    if (s>=60&&(!bestLost||s>bestLost.score)) bestLost={lost,score:s};
+  }
+  if (bestLost){
+    item.status='matched'; item.matchScore=bestLost.score; item.matchId=bestLost.lost.id;
+    store.updateItem(bestLost.lost.id,{status:'matched',matchScore:bestLost.score,matchId:item.id});
+    store.addEvent(bestLost.lost.caseId,'Possible match found');
+    store.addNotification({id:uid('n'),type:'match',title:'Possible match found',body:`Your ${bestLost.lost.title.toLowerCase()} may have been found.`,caseId:bestLost.lost.caseId,date:Date.now(),read:false});
+  }
+  store.addItem(item);
+  store.addEvent(caseId,'Reported');
+  rfDone={caseId,match:bestLost?bestLost.lost:null,score:bestLost?bestLost.score:0};
+  toast('Thank you','Your item is on the campus-wide search.');
+  renderReportFound();
+}
+
+/* =========================================================
+   File Uploader
+   ========================================================= */
+function renderFileUploader(mount,value,onChange){
+  if (!mount) return;
+  if (value){
+    mount.innerHTML=`<div class="relative rounded-2xl overflow-hidden" style="border:1px solid rgba(255,255,255,.1);">
+      <img src="${value}" alt="Item preview" class="w-full h-56 object-cover"/>
+      <button type="button" id="fu-remove" class="absolute top-3 right-3 p-2 rounded-full" style="background:rgba(10,15,13,.8);" aria-label="Remove photo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button></div>`;
+    $('#fu-remove').addEventListener('click',()=>onChange(undefined));
+  } else {
+    mount.innerHTML=`<label class="flex flex-col items-center justify-center gap-3 rounded-2xl cursor-pointer transition h-56 text-center px-6" style="border:2px dashed rgba(255,255,255,.1);" id="fu-label">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="color:#10A97A;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><p class="font-medium">Drop a photo here</p><p class="text-mist text-sm">or choose from device — JPG, PNG</p></div>
+      <input type="file" accept="image/*" id="fu-input" class="hidden"/>
+    </label>`;
+    const input=$('#fu-input'), label=$('#fu-label');
+    input.addEventListener('change',e=>handleFile(e.target.files&&e.target.files[0],onChange));
+    label.addEventListener('dragover',e=>{ e.preventDefault(); label.style.borderColor='rgba(16,169,122,.6)'; label.style.background='rgba(16,169,122,.05)'; });
+    label.addEventListener('dragleave',()=>{ label.style.borderColor='rgba(255,255,255,.1)'; label.style.background='transparent'; });
+    label.addEventListener('drop',e=>{ e.preventDefault(); label.style.borderColor='rgba(255,255,255,.1)'; label.style.background='transparent'; if(e.dataTransfer.files&&e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0],onChange); });
+  }
+}
+function handleFile(file,onChange){
+  if (!file||!file.type.startsWith('image/')) return;
+  const r=new FileReader(); r.onload=()=>onChange(r.result); r.readAsDataURL(file);
+}
+
+/* =========================================================
+   Item Details
+   ========================================================= */
+function renderItem(id){
+  const mount=$('#item-mount');
+  const item=store.getItems().find(i=>i.id===id);
+  if (!item){
+    mount.innerHTML=`<div class="card p-12 text-center"><p class="font-display text-2xl">Something went sideways.</p><p class="text-mist mt-2">We couldn't find that item.</p><button class="btn btn-primary mt-6" data-go="browse">Back to browse</button></div>`;
+    return;
+  }
+  const st=STATUS_META[item.status]||STATUS_META.searching;
+  const thumb=item.image
+    ?`<img src="${item.image}" alt="${esc(item.title)}" class="w-full h-full object-cover"/>`
+    :`<div class="w-full h-full flex items-center justify-center" style="background:linear-gradient(135deg,#0E1412,#111815,#070B09);"><span class="text-8xl">📦</span></div>`;
+
+  mount.innerHTML=`
+    <button class="text-sm text-mist hover:text-cream inline-flex items-center gap-1 mb-6" data-go="browse">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M11 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Back
+    </button>
+    <div class="grid lg:grid-cols-2 gap-10">
+      <div><div class="card overflow-hidden aspect-square">${thumb}</div></div>
+      <div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="chip ${st.cls}">${st.label}</span>
+          ${item.matchScore?`<span class="chip border-lime/50 text-lime bg-lime/10 inline-flex items-center gap-1">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2l1.8 5.6H20l-4.8 3.6 1.8 5.8L12 13.4 7 17l1.8-5.8L4 7.6h6.2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            ${item.matchScore}% match</span>`:''}
+        </div>
+        <h1 class="mt-5 font-display text-3xl sm:text-4xl tracking-tight">${esc(item.title)}</h1>
+        <div class="mt-5 space-y-3 text-sm">
+          <div class="flex items-center gap-3"><span class="text-mist w-24">Location</span><span>${esc(item.location)}</span></div>
+          <div class="flex items-center gap-3"><span class="text-mist w-24">Date</span><span>${fmtDate(item.date)}</span></div>
+          <div class="flex items-center gap-3"><span class="text-mist w-24">Category</span><span>${esc(item.category)}</span></div>
+          <div class="flex items-center gap-3"><span class="text-mist w-24">Colour</span><span>${esc(item.color)}</span></div>
+          <div class="flex items-center gap-3"><span class="text-mist w-24">Case</span><span class="font-mono text-xs">${esc(item.caseId)}</span></div>
+        </div>
+        <div class="mt-6"><p class="label">Description</p><p class="text-cream/90">${esc(item.description)}</p></div>
+        <div class="mt-8 p-4 rounded-2xl text-sm text-mist" style="background:rgba(16,169,122,.06);border:1px solid rgba(16,169,122,.2);">
+          <p class="flex items-center gap-2" style="color:#28D9A0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            Some item details are hidden to protect ownership verification.
+          </p>
+        </div>
+        ${item.type==='found'?`<div class="mt-8">
+          <p class="font-display text-xl tracking-tight">Could this be yours?</p>
+          <p class="text-mist text-sm mt-1">You'll be asked one private question to verify ownership.</p>
+          <button class="btn btn-primary mt-4" id="claim-open">Claim this item</button>
+        </div>`:''}
+      </div>
+    </div>`;
+
+  const c=$('#claim-open'); if(c) c.addEventListener('click',()=>openClaimFlow(item));
+}
+
+function openClaimFlow(item){
+  const html=`
+    <p class="text-mist text-sm">Let's make sure it really belongs to you.</p>
+    <div class="mt-5">
+      <label class="label" for="claim-answer">${item.hiddenDetail?'What identifying mark does the item have?':'Describe something that only the owner would know.'}</label>
+      <input id="claim-answer" class="field" placeholder="Your answer…" autofocus/>
+      <p class="text-[11px] text-mist mt-2">This is not shown publicly — it helps prevent false claims.</p>
+    </div>
+    <button class="btn btn-primary w-full mt-6 justify-center" id="claim-submit">Submit claim</button>`;
+  openModal('Verify ownership',html);
+
+  $('#claim-submit').addEventListener('click',()=>{
+    const a=($('#claim-answer').value||'').trim().toLowerCase();
+    const expected=(item.hiddenDetail||'').toLowerCase();
+    const ok=a.length>2&&(expected?expected.includes(a)||a.includes(expected.split(' ')[0]):a.length>5);
+
+    if (ok){
+      store.updateItem(item.id,{verified:true,status:'received'});
+      store.addEvent(item.caseId,'Match verified');
+      store.addEvent(item.caseId,'Handed to Student Support');
+      store.addNotification({id:uid('n'),type:'received',title:'Item received',body:`Your ${item.title.toLowerCase()} has been handed to Student Support.`,caseId:item.caseId,date:Date.now(),read:false});
+      openModal('Claim verified',`
+        <div class="text-center py-6 animate-rise">
+          <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center" style="background:rgba(184,255,92,.15);border:1px solid rgba(184,255,92,.4);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="color:#B8FF5C;"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <p class="font-display text-2xl mt-5 tracking-tight">CLAIM VERIFIED.</p>
+          <p class="text-mist mt-2 text-sm">Student Support will be in touch to arrange collection.</p>
+          <button class="btn btn-ghost mt-6" onclick="document.getElementById('modal-close').click()">Close</button>
+        </div>`);
+    } else {
+      openModal('Verification',`
+        <div class="text-center py-6 animate-rise">
+          <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="color:#f87171;"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </div>
+          <p class="font-display text-xl mt-5 tracking-tight">We couldn't verify ownership yet.</p>
+          <p class="text-mist mt-2 text-sm">Student Support will review the claim.</p>
+          <button class="btn btn-ghost mt-6" onclick="document.getElementById('modal-close').click()">Close</button>
+        </div>`);
+    }
+  });
+}
+
+/* =========================================================
+   Match Card
+   ========================================================= */
+function matchCardHTML(score,lost,found){
+  return `
+    <div class="card p-5 sm:p-6 relative overflow-hidden">
+      <div class="absolute -top-20 -right-20 w-64 h-64 rounded-full pointer-events-none" style="background:rgba(184,255,92,.1);filter:blur(60px);"></div>
+      <div class="relative">
+        <span class="chip border-lime/60 text-lime bg-lime/10 inline-flex items-center gap-1">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2l1.8 5.6H20l-4.8 3.6 1.8 5.8L12 13.4 7 17l1.8-5.8L4 7.6h6.2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          Possible match
+        </span>
+        <p class="mt-4 font-display text-3xl sm:text-4xl tracking-tight" style="color:#B8FF5C;">${score}<span class="text-xl align-top">%</span></p>
+        <p class="text-mist text-sm mt-1">Your lost item may have been found.</p>
+      </div>
+      <div class="mt-6 grid sm:grid-cols-2 gap-4">
+        <div class="rounded-2xl p-4" style="border:1px solid rgba(255,255,255,.08);background:rgba(14,20,18,.5);">
+          <p class="label">Lost report</p>
+          <p class="font-medium">${esc(lost.title)}</p>
+          <p class="text-sm text-mist mt-1">${esc(lost.location)} · ${fmtDate(lost.date)}</p>
+        </div>
+        <div class="rounded-2xl p-4" style="border:1px solid rgba(184,255,92,.3);background:rgba(184,255,92,.04);">
+          <p class="label" style="color:rgba(184,255,92,.8);">Found report</p>
+          <p class="font-medium">${esc(found.title)}</p>
+          <p class="text-sm text-mist mt-1">${esc(found.location)} · ${fmtDate(found.date)}</p>
+        </div>
+      </div>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button class="btn btn-lime" data-item-link="${found.id}">View match
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>`;
+}
+
+/* =========================================================
+   My Cases
+   ========================================================= */
+function renderCases(){
+  const mount=$('#cases-mount');
+  const items=store.getItems();
+  const events=store.getEvents();
+  const mine=items.filter(i=>i.type==='lost');
+  const STAGES=['Reported','Possible match found','Match verified','Handed to Student Support','Ready for collection','Collected'];
+
+  function timeline(caseId,status){
+    const evs=events[caseId]||[];
+    const em={}; evs.forEach(e=>{em[e.label]=e.at;});
+    const visible=STAGES.filter(s=>{
+      if (s==='Possible match found'||s==='Match verified') return em[s]||['matched','received','ready','collected'].indexOf(status)!==-1;
+      if (s==='Handed to Student Support') return em[s]||['received','ready','collected'].indexOf(status)!==-1;
+      if (s==='Ready for collection') return em[s]||['ready','collected'].indexOf(status)!==-1;
+      if (s==='Collected') return em[s]||status==='collected';
+      return true;
+    });
+    return `<ol class="relative pl-6">${visible.map((s,i)=>{
+      const at=em[s], done=!!at;
+      return `<li class="relative pb-6 last:pb-0">
+        <span class="absolute -left-6 top-1 flex items-center justify-center w-4 h-4 rounded-full border" style="${done?'background:#10A97A;border-color:#10A97A;color:#0A0F0D;':'background:#0A0F0D;border-color:rgba(255,255,255,.15);'}">${done?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</span>
+        ${i<visible.length-1?`<span class="absolute top-5 bottom-0 w-px" style="left:-18px;background:rgba(255,255,255,.1);"></span>`:''}
+        <p class="text-sm ${done?'text-cream':'text-mist'}">${s}</p>
+        ${at?`<p class="text-xs text-mist mt-0.5">${fmtDT(at)}</p>`:''}
+      </li>`;
+    }).join('')}</ol>`;
+  }
+
+  mount.innerHTML=`
+    <p class="label">Case tracker</p>
+    <h1 class="font-display text-4xl sm:text-5xl tracking-tight">My cases</h1>
+    <p class="text-mist mt-3">Every report you've opened with TRACEDU — across every campus.</p>
+    <div class="mt-10 space-y-6">
+      ${mine.length===0?`
+        <div class="card p-12 text-center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="mx-auto mb-4" style="color:#8BA399;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z M14 2v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <p class="font-display text-xl">No cases yet.</p>
+          <p class="text-mist text-sm mt-2">When you report something, it will appear here.</p>
+          <button class="btn btn-primary mt-6" data-go="report-lost">Report something lost</button>
+        </div>`:mine.map(item=>{
+          const matched=item.matchId?items.find(i=>i.id===item.matchId):null;
+          const st=STATUS_META[item.status]||STATUS_META.searching;
+          return `
+            <div class="card p-6 lg:p-8">
+              <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p class="text-xs font-mono text-mist">${esc(item.caseId)}</p>
+                  <h2 class="font-display text-2xl tracking-tight mt-1">${esc(item.title)}</h2>
+                  <div class="flex items-center gap-3 mt-2 text-xs text-mist flex-wrap"><span>${esc(item.location)}</span><span>·</span><span>${fmtDate(item.date)}</span></div>
+                </div>
+                <span class="chip ${st.cls}">${st.label}</span>
+              </div>
+              <div class="mt-6 grid lg:grid-cols-2 gap-8">
+                <div><p class="label">Timeline</p>${timeline(item.caseId,item.status)}</div>
+                <div>
+                  ${matched?`<div class="mb-5 p-4 rounded-2xl" style="border:1px solid rgba(184,255,92,.3);background:rgba(184,255,92,.04);">
+                    <p class="text-xs uppercase tracking-widest" style="color:#B8FF5C;">Possible match</p>
+                    <p class="mt-2 font-medium">${esc(matched.title)}</p>
+                    <p class="text-xs text-mist mt-1">${esc(matched.location)}</p>
+                    ${item.matchScore?`<p class="font-display text-2xl mt-2" style="color:#B8FF5C;">${item.matchScore}%</p>`:''}
+                    <button class="btn btn-lime mt-3 w-full justify-center" data-item-link="${matched.id}">View match</button>
+                  </div>`:''}
+                  ${item.status==='ready'?`<div class="p-4 rounded-2xl" style="background:rgba(184,255,92,.1);border:1px solid rgba(184,255,92,.4);">
+                    <p class="font-display text-lg" style="color:#B8FF5C;">Ready for collection</p>
+                    <p class="text-sm text-cream/80 mt-1">Student Support Office — Main Campus, Block C, Ground Floor</p>
+                    <p class="text-sm text-mist mt-2">Bring your student ID.</p>
+                    <button class="btn btn-primary mt-4 w-full justify-center" data-mark-collected="${item.id}">Mark as collected</button>
+                  </div>`:''}
+                  ${item.status==='collected'?`<div class="p-4 rounded-2xl text-center" style="border:1px solid rgba(16,169,122,.4);background:rgba(16,169,122,.05);">
+                    <p class="font-display text-lg" style="color:#28D9A0;">Your item made it home.</p>
+                    <p class="text-xs text-mist mt-1">Thanks for using TRACEDU.</p>
+                  </div>`:''}
+                  ${item.status==='searching'?`<div class="p-4 rounded-2xl" style="border:1px solid rgba(255,255,255,.06);">
+                    <p class="text-sm">Nothing has matched yet.</p>
+                    <p class="text-xs text-mist mt-1">We'll keep checking across every campus.</p>
+                    <button class="btn btn-ghost mt-4 w-full justify-center" data-go="report-lost">Update report</button>
+                  </div>`:''}
+                </div>
+              </div>
+            </div>`;
+        }).join('')}
+    </div>`;
+
+  $$('[data-mark-collected]',mount).forEach(el=>el.addEventListener('click',()=>{
+    store.updateItem(el.dataset.markCollected,{status:'collected'});
+    store.addEvent(el.dataset.markCollected,'Collected');
+    toast('Your item made it home.','Thank you for using TRACEDU.');
+    renderCases();
+  }));
+}
+
+/* =========================================================
+   Notifications
+   ========================================================= */
+function renderNotifications(){
+  const mount=$('#notifications-mount');
+  const items=store.getNotifications();
+  const ICONS={
+    match:'<path d="M12 2l1.8 5.6H20l-4.8 3.6 1.8 5.8L12 13.4 7 17l1.8-5.8L4 7.6h6.2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
+    received:'<path d="M21 16V8a2 2 0 00-1-1.7l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.7l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z M3.3 7l8.7 5 8.7-5 M12 22V12" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
+    ready:'<path d="M12 2a10 10 0 100 20 10 10 0 000-20z M8 12l2.5 2.5L16 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    resolved:'<path d="M12 2a10 10 0 100 20 10 10 0 000-20z M8 12l2.5 2.5L16 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    update:'<circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
+  };
+
+  mount.innerHTML=`
+    <p class="label">Notifications</p>
+    <h1 class="font-display text-4xl sm:text-5xl tracking-tight">What's new.</h1>
+    <p class="text-mist mt-3">Match alerts, handover updates and collection notices — from any campus.</p>
+    <div class="mt-10 space-y-3">
+      ${items.length>0?`<div class="flex justify-end"><button class="text-xs text-mist hover:text-cream" id="mark-all-read">Mark all as read</button></div>`:''}
+      ${items.length===0?`<div class="card p-10 text-center">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="mx-auto mb-3" style="color:#8BA399;"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p class="font-display text-lg">All quiet.</p>
+        <p class="text-mist text-sm mt-1">We'll notify you the moment something turns up.</p>
+      </div>`:items.map(n=>`
+        <div class="card p-4 flex gap-4 items-start ${!n.read?'border-emer/30':''}">
+          <div class="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style="${n.read?'background:rgba(255,255,255,.05);color:#8BA399;':'background:rgba(16,169,122,.15);color:#28D9A0;'}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">${ICONS[n.type]||ICONS.update}</svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2"><p class="font-medium">${esc(n.title)}</p>${!n.read?`<span class="w-1.5 h-1.5 rounded-full" style="background:#B8FF5C;"></span>`:''}</div>
+            <p class="text-sm text-mist mt-0.5">${esc(n.body)}</p>
+            <p class="text-[11px] text-mist/70 mt-1">${fmtDT(n.date)}</p>
+            ${n.caseId?`<button class="text-xs mt-2 inline-block" style="color:#28D9A0;" data-go="cases">Track case →</button>`:''}
+          </div>
+        </div>`).join('')}
+    </div>`;
+
+  const m=$('#mark-all-read'); if(m) m.addEventListener('click',()=>{ store.markAllRead(); renderNotifications(); });
+}
+
+/* =========================================================
+   Campus Map Page
+   ========================================================= */
+function mapPageHTML(){
+  return `<p class="label">Campus map</p>
+    <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl tracking-tight">Where things turn up.</h1>
+    <p class="text-mist mt-3 max-w-lg">Explore live lost and found activity across every campus.</p>
+    <div class="mt-10">${renderCampusMapHTML({compact:false})}</div>`;
+}
+
+/* =========================================================
+   Good Samaritan
+   ========================================================= */
+function renderSamaritan(){
+  const mount=$('#samaritan-mount');
+  const entries=['Returned a wallet','Returned a calculator','Returned headphones','Returned a student ID','Returned a water bottle','Returned a backpack'];
+  const stars='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>';
+  mount.innerHTML=`
+    <p class="label">Community</p>
+    <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl tracking-tight">People who help.</h1>
+    <p class="text-mist mt-3">A little honesty goes a long way — across every campus.</p>
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      ${entries.map(e=>`<div class="card p-6 card-hover">
+        <div class="flex gap-0.5 mb-3" style="color:#B8FF5C;">${stars.repeat(5)}</div>
+        <p class="font-medium">Anonymous Student</p>
+        <p class="text-mist text-sm mt-1">${e}</p>
+      </div>`).join('')}
+    </div>
+    <div class="mt-12 card p-8 text-center relative overflow-hidden">
+      <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full pointer-events-none" style="background:rgba(16,169,122,.15);filter:blur(60px);"></div>
+      <div class="relative">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="mx-auto" style="color:#28D9A0;"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <p class="font-display text-5xl mt-4 tracking-tight">47</p>
+        <p class="text-mist mt-1">items returned by students this month</p>
+      </div>
+    </div>
+    <p class="text-center text-xs text-mist mt-6 max-w-md mx-auto">Student identities are never shown. Recognition is anonymous by design.</p>`;
+}
+
+/* =========================================================
+   Admin
+   ========================================================= */
+let adminAuthed=false;
+function renderAdmin(){
+  const mount=$('#admin-mount');
+  if (!adminAuthed){
+    mount.innerHTML=`
+      <div class="max-w-md mx-auto text-center py-16">
+        <div class="card p-8">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" class="mx-auto" style="color:#28D9A0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          <h1 class="font-display text-2xl mt-5 tracking-tight">Student Support</h1>
+          <p class="text-mist text-sm mt-2">Demo access to the multi-campus operations panel.</p>
+          <button class="btn btn-primary w-full mt-6 justify-center" id="admin-enter">Enter demo panel</button>
+        </div>
+      </div>`;
+    $('#admin-enter').addEventListener('click',()=>{ adminAuthed=true; renderAdmin(); });
+    return;
+  }
+
+  const items=store.getItems();
+  const stats={
+    open:items.filter(i=>i.type==='lost'&&i.status==='searching').length,
+    found:items.filter(i=>i.type==='found').length,
+    matches:items.filter(i=>i.status==='matched').length,
+    awaiting:items.filter(i=>i.status==='received').length,
+    ready:items.filter(i=>i.status==='ready').length,
+    resolved:items.filter(i=>i.status==='collected').length
+  };
+
+  mount.innerHTML=`
+    <p class="label">Student Support · Operations</p>
+    <h1 class="font-display text-4xl sm:text-5xl tracking-tight">Dashboard</h1>
+    <div class="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      ${[['Open lost',stats.open],['Found items',stats.found],['Potential matches',stats.matches],['Awaiting verification',stats.awaiting],['Ready for collection',stats.ready],['Resolved',stats.resolved]].map(([l,v])=>`<div class="card p-4"><p class="text-2xl font-display tracking-tight">${v}</p><p class="text-mist text-[11px] mt-1 uppercase tracking-wider">${l}</p></div>`).join('')}
+    </div>
+    <div class="mt-8 flex flex-wrap gap-3 items-center">
+      <div class="relative flex-1 min-w-[220px]">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="absolute left-4 top-1/2 -translate-y-1/2" style="color:#8BA399;"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="admin-search" class="field" placeholder="Search case ID or title…" style="padding-left:2.75rem;"/>
+      </div>
+      <select id="admin-filter" class="field" style="width:auto;">
+        <option value="all">All statuses</option>
+        <option value="searching">Searching</option>
+        <option value="found">Found</option>
+        <option value="matched">Matched</option>
+        <option value="received">Received</option>
+        <option value="ready">Ready</option>
+        <option value="collected">Collected</option>
+      </select>
+    </div>
+    <div class="mt-6 card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="text-[11px] uppercase tracking-widest text-mist">
+            <tr style="border-bottom:1px solid rgba(255,255,255,.06);">
+              <th class="text-left px-5 py-3">Case ID</th>
+              <th class="text-left px-5 py-3">Item</th>
+              <th class="text-left px-5 py-3">Type</th>
+              <th class="text-left px-5 py-3 hidden sm:table-cell">Location</th>
+              <th class="text-left px-5 py-3 hidden md:table-cell">Date</th>
+              <th class="text-left px-5 py-3">Status</th>
+              <th class="text-left px-5 py-3">Match</th>
+              <th class="text-left px-5 py-3">Action</th>
+            </tr>
+          </thead>
+          <tbody id="admin-tbody"></tbody>
+        </table>
+      </div>
+    </div>`;
+
+  function renderRows(){
+    const q=($('#admin-search').value||'').toLowerCase();
+    const f=$('#admin-filter').value;
+    let list=items;
+    if (q) list=list.filter(i=>i.title.toLowerCase().includes(q)||i.caseId.toLowerCase().includes(q));
+    if (f!=='all') list=list.filter(i=>i.status===f);
+    const tbody=$('#admin-tbody');
+    if (list.length===0){ tbody.innerHTML=`<tr><td colspan="8" class="px-5 py-16 text-center text-mist">No reports match your filters.</td></tr>`; return; }
+    tbody.innerHTML=list.map(i=>{
+      const st=STATUS_META[i.status]||STATUS_META.searching;
+      return `<tr style="border-bottom:1px solid rgba(255,255,255,.04);">
+        <td class="px-5 py-3 font-mono text-xs text-mist">${esc(i.caseId)}</td>
+        <td class="px-5 py-3">${esc(i.title)}</td>
+        <td class="px-5 py-3 capitalize text-mist">${i.type}</td>
+        <td class="px-5 py-3 text-mist hidden sm:table-cell">${esc(i.location)}</td>
+        <td class="px-5 py-3 text-mist hidden md:table-cell">${fmtDate(i.date)}</td>
+        <td class="px-5 py-3"><span class="chip ${st.cls}">${st.label}</span></td>
+        <td class="px-5 py-3" style="color:#B8FF5C;">${i.matchScore?i.matchScore+'%':'—'}</td>
+        <td class="px-5 py-3"><button class="text-xs hover:underline" style="color:#28D9A0;" data-admin-manage="${i.id}">Manage</button></td>
+      </tr>`;
+    }).join('');
+    $$('[data-admin-manage]',tbody).forEach(el=>el.addEventListener('click',()=>openAdminManage(el.dataset.adminManage)));
+  }
+
+  $('#admin-search').addEventListener('input',renderRows);
+  $('#admin-filter').addEventListener('change',renderRows);
+  renderRows();
+
+  function openAdminManage(id){
+    const item=store.getItems().find(i=>i.id===id);
+    if (!item) return;
+    const st=STATUS_META[item.status]||STATUS_META.searching;
+    const html=`
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-xs font-mono text-mist">${esc(item.caseId)}</span>
+        <span class="chip ${st.cls}">${st.label}</span>
+      </div>
+      <div class="mb-4"><p class="label">Description</p><p class="text-sm text-cream/85">${esc(item.description)}</p></div>
+      ${item.hiddenDetail?`<div class="p-3 rounded-2xl mb-4 text-sm" style="border:1px solid rgba(16,169,122,.25);background:rgba(16,169,122,.05);">
+        <p class="text-[11px] uppercase tracking-widest mb-1" style="color:#28D9A0;">Verification detail (private)</p>
+        <p>${esc(item.hiddenDetail)}</p>
+      </div>`:''}
+      <div>
+        <p class="label">Update status</p>
+        <div class="grid grid-cols-2 gap-2">
+          ${item.status==='matched'||item.status==='found'?'<button class="btn btn-ghost justify-center col-span-2" data-adv="received">Mark received by Support</button>':''}
+          ${item.status==='received'?'<button class="btn btn-lime justify-center col-span-2" data-adv="ready">Mark ready for collection</button>':''}
+          ${item.status==='ready'?'<button class="btn btn-lime justify-center col-span-2" data-adv="collected">Mark as collected</button>':''}
+          ${item.status!=='found'?'<button class="btn btn-ghost justify-center col-span-2" data-adv="found">Reset to found</button>':''}
+        </div>
+      </div>`;
+    openModal(item.title,html);
+
+    $$('[data-adv]',$('#modal-body')).forEach(btn=>btn.addEventListener('click',()=>{
+      const next=btn.dataset.adv;
+      const labels={received:'Handed to Student Support',ready:'Ready for collection',collected:'Collected'};
+      store.updateItem(item.id,{status:next});
+      if (labels[next]) store.addEvent(item.caseId,labels[next]);
+      if (next==='ready'){
+        store.addNotification({id:uid('n'),type:'ready',title:'Ready for collection',body:`Your ${item.title.toLowerCase()} is ready to collect.`,caseId:item.caseId,date:Date.now(),read:false});
+      }
+      if (next==='collected'){
+        store.addNotification({id:uid('n'),type:'resolved',title:'Your item made it home.',body:`Case ${item.caseId} is now closed.`,caseId:item.caseId,date:Date.now(),read:false});
+      }
+      closeModal();
+      renderAdmin();
+    }));
+  }
+}
+
+/* =========================================================
+   DEMO TOUR — guided 90-second walkthrough
+   ========================================================= */
+const DEMO_STEPS=[
+  { title:'1 · Browse the campus feed', desc:'See the searchable campus database.', run:()=>{ go('browse'); } },
+  { title:'2 · Submit a lost report', desc:'A sample calculator report is created automatically.', run:()=>{ runDemoLost(); } },
+  { title:'3 · See the smart match', desc:'The sample report is matched at 92% confidence.', run:()=>{ runDemoMatch(); } },
+  { title:'4 · Verify ownership', desc:'A private identifying detail prevents false claims.', run:()=>{ runDemoVerify(); } },
+  { title:'5 · Student Support handover', desc:'The item moves from received to ready for collection.', run:()=>{ runDemoHandover(); } }
+];
+
+let demoStep=0;
+let demoCaseId=null;
+let demoLostId=null;
+const demoFoundId='it-01';
+
+function startDemo(){
+  demoStep=0; demoCaseId=null; demoLostId=null;
+  $('#demo-bar').classList.remove('hidden');
+  showDemoStep(0);
+}
+function updateDemoProgress(i){ const p=$('#demo-progress'); if(p) p.style.width=`${Math.max(20,Math.min(100,((i+1)/DEMO_STEPS.length)*100))}%`; }
+function showDemoStep(i){
+  demoStep=i; const s=DEMO_STEPS[i];
+  if(!s) return endDemo(true);
+  $('#demo-step-num').textContent=`${i+1}/${DEMO_STEPS.length}`;
+  $('#demo-title').textContent=s.title; updateDemoProgress(i); s.run();
+}
+function advanceDemo(){ showDemoStep(demoStep+1); }
+function endDemo(finished){
+  $('#demo-bar').classList.add('hidden');
+  if(finished){
+    toast('Demo complete','You just ran the full lost-and-found cycle.');
+    setTimeout(()=>openModal('Demo complete.',`
+      <p class="text-mist text-sm">You just saw the complete TRACEDU workflow using sample data — the same flow works across every campus.</p>
+      <ol class="mt-5 space-y-2 text-sm">
+        <li>1. <span style="color:#28D9A0;">Browse</span> — search the campus-wide feed</li>
+        <li>2. <span style="color:#28D9A0;">Report</span> — submit a sample lost calculator</li>
+        <li>3. <span style="color:#28D9A0;">Match</span> — receive a 92% possible match</li>
+        <li>4. <span style="color:#28D9A0;">Verify</span> — confirm ownership privately</li>
+        <li>5. <span style="color:#28D9A0;">Handover</span> — Student Support marks it ready</li>
+      </ol>
+      <div class="demo-note mt-5"><p class="text-xs font-medium" style="color:#B8FF5C;">THIS IS A PROTOTYPE DEMO</p><p class="text-xs text-mist mt-1">All actions use sample data stored in this browser. No real university records, accounts, emails or notifications are connected.</p></div>
+      <button class="btn btn-primary w-full mt-6 justify-center" onclick="document.getElementById('modal-close').click()">Done</button>`),300);
+  }
+}
+function ensureDemoFoundItem(){
+  const found=store.getItems().find(i=>i.id===demoFoundId);
+  if(found){ store.updateItem(found.id,{status:'found',matchScore:undefined,matchId:undefined}); return store.getItems().find(i=>i.id===demoFoundId); }
+  return null;
+}
+function cleanupPreviousDemo(){
+  store.getItems().filter(i=>i.demo===true).forEach(i=>store.removeItem(i.id));
+  store.setNotifications(store.getNotifications().filter(n=>!n.demo));
+}
+function createDemoLost(){
+  cleanupPreviousDemo();
+  const found=ensureDemoFoundItem();
+  const caseId='#TRC-DEMO';
+  const lost={id:uid('demo-lost'),caseId,type:'lost',demo:true,title:'Black Casio Calculator',category:'Electronics',color:'Black',brand:'Casio',description:'Black Casio scientific calculator with a small scratch near the display.',distinctive:'Small scratch near the display',location:'Science Building',date:new Date(Date.now()-6*86400000).toISOString().slice(0,10),time:'12:00',status:'searching',image:PHOTO.calculator,createdAt:Date.now()};
+  lost.status=found?'matched':'searching'; lost.matchScore=found?92:0; lost.matchId=found?found.id:null;
+  if(found) store.updateItem(found.id,{status:'matched',matchScore:92,matchId:lost.id});
+  store.addItem(lost); store.addEvent(caseId,'Reported'); if(found) store.addEvent(caseId,'Possible match found');
+  store.addNotification({id:uid('n'),type:'match',demo:true,title:'Possible match found',body:'Your sample calculator has a 92% possible match.',caseId,date:Date.now(),read:false});
+  demoCaseId=caseId; demoLostId=lost.id; return lost;
+}
+function runDemoLost(){ const lost=createDemoLost(); go('cases'); setTimeout(()=>toast('Sample report created',`Demo case ${lost.caseId} is now matched.`),250); }
+function runDemoMatch(){ if(!store.getItems().find(i=>i.id===demoLostId)) createDemoLost(); go('cases'); setTimeout(()=>toast('92% possible match','Same category, colour, location and matching keywords.'),250); }
+function runDemoVerify(){
+  const found=store.getItems().find(i=>i.id===demoFoundId); if(!found){go('browse');return;}
+  go('item',found.id);
+  setTimeout(()=>{ const claim=$('#claim-open'); if(claim){ claim.click(); setTimeout(()=>{ const answer=$('#claim-answer'),submit=$('#claim-submit'); if(answer) answer.value='Blue sticker underneath'; if(submit) submit.click(); },350); } },300);
+}
+function runDemoHandover(){
+  const found=store.getItems().find(i=>i.id===demoFoundId); if(!found){go('admin');return;}
+  const lost=store.getItems().find(i=>i.id===demoLostId);
+  store.updateItem(found.id,{status:'received'});
+  store.addEvent(demoCaseId||found.caseId,'Match verified');
+  store.addEvent(demoCaseId||found.caseId,'Handed to Student Support');
+  store.updateItem(found.id,{status:'ready'});
+  store.addEvent(demoCaseId||found.caseId,'Ready for collection');
+  if(lost) store.updateItem(lost.id,{status:'ready',matchScore:92,matchId:found.id});
+  store.addNotification({id:uid('n'),type:'received',demo:true,title:'Item received',body:'Student Support has received the sample calculator.',caseId:demoCaseId||found.caseId,date:Date.now(),read:false});
+  store.addNotification({id:uid('n'),type:'ready',demo:true,title:'Ready for collection',body:'The sample calculator is ready for collection.',caseId:demoCaseId||found.caseId,date:Date.now(),read:false});
+  closeModal();
+  go('notifications'); setTimeout(()=>toast('Handover complete','Student Support → Ready for collection.'),250);
+}
+
+$('#demo-next').addEventListener('click',advanceDemo);
+$('#demo-skip').addEventListener('click',()=>endDemo(false));
+$('#demo-open-btn').addEventListener('click',()=>openDemoIntro());
+document.addEventListener('click',e=>{
+  if (e.target.id==='home-demo-btn'||e.target.closest('#home-demo-btn')){ openDemoIntro(); }
+});
+
+function openDemoIntro(){
+  openModal('TRACEDU guided demo',`
+    <p class="text-mist text-sm">This is a clickable prototype, not a live university system. The tour runs a complete example with sample data in your browser — the same flow works for students on any campus.</p>
+    <div class="demo-note mt-5"><p class="text-xs font-medium" style="color:#B8FF5C;">WHAT YOU'LL SEE</p><p class="text-xs text-mist mt-1">A student reports a lost calculator → TRACEDU finds a 92% possible match → ownership is verified → Student Support receives the item → it becomes ready for collection.</p></div>
+    <ol class="mt-5 space-y-3 text-sm">
+      <li class="flex gap-3"><span class="w-6 h-6 rounded-full flex-none flex items-center justify-center font-bold text-xs" style="background:rgba(16,169,122,.15);color:#28D9A0;">1</span><div><p class="font-medium">Browse</p><p class="text-mist text-xs">Open the campus-wide feed and see searchable reports.</p></div></li>
+      <li class="flex gap-3"><span class="w-6 h-6 rounded-full flex-none flex items-center justify-center font-bold text-xs" style="background:rgba(16,169,122,.15);color:#28D9A0;">2</span><div><p class="font-medium">Report</p><p class="text-mist text-xs">The demo creates the sample lost report automatically.</p></div></li>
+      <li class="flex gap-3"><span class="w-6 h-6 rounded-full flex-none flex items-center justify-center font-bold text-xs" style="background:rgba(16,169,122,.15);color:#28D9A0;">3</span><div><p class="font-medium">Match</p><p class="text-mist text-xs">The sample calculator is shown as a 92% possible match.</p></div></li>
+      <li class="flex gap-3"><span class="w-6 h-6 rounded-full flex-none flex items-center justify-center font-bold text-xs" style="background:rgba(16,169,122,.15);color:#28D9A0;">4</span><div><p class="font-medium">Verify</p><p class="text-mist text-xs">The demo uses a private identifying detail to verify ownership.</p></div></li>
+      <li class="flex gap-3"><span class="w-6 h-6 rounded-full flex-none flex items-center justify-center font-bold text-xs" style="background:rgba(16,169,122,.15);color:#28D9A0;">5</span><div><p class="font-medium">Handover</p><p class="text-mist text-xs">Student Support moves the item to ready for collection.</p></div></li>
+    </ol>
+    <div class="mt-6 flex gap-2"><button class="btn btn-primary flex-1 justify-center" id="demo-start">Start guided demo</button><button class="btn btn-ghost" id="demo-cancel">Maybe later</button></div>`);
+  $('#demo-start').addEventListener('click',()=>{closeModal();setTimeout(startDemo,120);});
+  $('#demo-cancel').addEventListener('click',closeModal);
+}
+
+function boot(){
+  store.ensureSeeded();
+  resetRL(); resetRF();
+  renderNav(); updateNotifDot();
+
+  const h=window.location.hash.replace(/^#\/?/,'');
+  const [r,p]=h.split('/');
+  if (r&&ROUTES.indexOf(r)!==-1) go(r,p);
+  else go('home');
+
+  window.addEventListener('scroll',()=>{
+    const nav=$('#navbar'); if(!nav) return;
+    if (window.scrollY>8){ nav.classList.add('glass'); nav.style.borderBottom='1px solid rgba(255,255,255,.06)'; }
+    else { nav.classList.remove('glass'); nav.style.borderBottom=''; }
+  });
+
+  if (!localStorage.getItem('tracedu.welcomed')){
+    setTimeout(()=>{
+      openModal('Welcome to TRACEDU.',`
+        <p class="text-mist text-sm mb-3">A shared lost-and-found for university students across every campus.</p>
+        <div class="space-y-3 mb-6">
+          <div class="flex items-start gap-3 text-sm"><span style="color:#28D9A0;">—</span> Report lost items in seconds, from any campus</div>
+          <div class="flex items-start gap-3 text-sm"><span style="color:#28D9A0;">—</span> Browse found items across every university</div>
+          <div class="flex items-start gap-3 text-sm"><span style="color:#28D9A0;">—</span> Get notified the moment a match appears</div>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <button class="btn btn-lime flex-1 justify-center" id="welcome-demo">▶ Try the 90-second demo</button>
+          <button class="btn btn-ghost flex-1 justify-center" id="welcome-skip">Just browse</button>
+        </div>`);
+      const skip=()=>{ localStorage.setItem('tracedu.welcomed','1'); };
+      $('#welcome-demo').addEventListener('click',()=>{ skip(); closeModal(); setTimeout(()=>{ openDemoIntro(); },200); });
+      $('#welcome-skip').addEventListener('click',()=>{ skip(); closeModal(); });
+    },700);
+  }
+}
+
+boot();
+window.TRACEDU={go,store,toast,openModal,closeModal,startDemo};
+
+})();
+</script>
+</body>
+</html>
